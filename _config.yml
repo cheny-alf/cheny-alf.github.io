@@ -5,7 +5,7 @@ menu:
   Gallery: /gallery
   About: /about
 rss: /atom.xml
-
+theme: ocean
 
 # Miscellaneous
 favicon: /favicon.ico
