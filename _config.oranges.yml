@@ -79,33 +79,33 @@ comments:
 
 # 主题页面导航栏
 navbar:
-  -
-    name: Home
+   -
+    name: 主页
     enable: true
     path: /
     key: home
   -
-    name: Archives
+    name: 归档
     enable: true
     path: /archives/
     key: archives
   -
-    name: Categories
+    name: 分类
     enable: false
     path: /categories/
     key: categories
   -
-    name: Tags
+    name: 标签
     enable: true
     path: /tags/
     key: tags
   -
-    name: Friends
+    name: 朋友
     enable: true
     path: /friends/
     key: friends
   -
-    name: About
+    name: 关于
     enable: true
     path: /about/
     key: about
@@ -187,7 +187,7 @@ footer:
   # 浏览量统计
   # http://busuanzi.ibruce.info/
   views:
-    enable: false
+    enable: true
     provider: '//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js'
     item:
       -
