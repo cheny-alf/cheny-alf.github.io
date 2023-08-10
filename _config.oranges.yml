@@ -27,7 +27,7 @@ favicon:
 # 用户头像与昵称
 avatar:
   author_photo: /images/avatar.png
-  author_nickname: Oranges
+  author_nickname: 陈sir爱狂扁
   path: /
 
 # Google 分析
@@ -145,7 +145,7 @@ footer:
     -
       name: github
       icon: github
-      path: https://github.com/zchengsite/hexo-theme-oranges
+      path: https://github.com/cheny-alf
     # -
     #   name: email
     #   icon: envelope
