@@ -12,7 +12,7 @@
   <title>
     
       Tag 
-       : Golang
+       : golang
       
       |
     
@@ -113,15 +113,15 @@
 <div class="container tag-details">
   <div class="content-title">
     <h2>
-      <span>Golang</span>
+      <span>golang</span>
     </h2>
   </div>
   
     <div class="post-list">
-      <div class="post-item" title="基于 Redis 实现的支持延时/定时投递的消息队列">
-        <span class="time-m-d">2023-07-10</span>
-        <a href="/2023/07/10/delay-queue/">
-          <span>基于 Redis 实现的支持延时/定时投递的消息队列</span>
+      <div class="post-item" title="常见的限流方案与实现">
+        <span class="time-m-d">2023-07-11</span>
+        <a href="/2023/07/11/limiter/">
+          <span>常见的限流方案与实现</span>
         </a>
       </div>
     </div>
@@ -354,6 +354,60 @@
             str += "</ul>";
             if (str.indexOf('<li>') === -1) {
               return $resultContent.innerHTML = "<ul><span class='local-search-empty'>No result<span></ul>";
+            }
+            $resultContent.innerHTML = str;
+          });
+        },
+        error: function(xhr, status, error) {
+          $resultContent.innerHTML = ""
+          if (xhr.status === 404) {
+            $resultContent.innerHTML = "<ul><span class='local-search-empty'>The search.xml file was not found, please refer to：<a href='https://github.com/zchengsite/hexo-theme-oranges#configuration' target='_black'>configuration</a><span></ul>";
+          } else {
+            $resultContent.innerHTML = "<ul><span class='local-search-empty'>The request failed, Try to refresh the page or try again later.<span></ul>";
+          }
+        }
+      });
+      $(document).on('click', '#search-close-icon', function() {
+        $('#search-input').val('');
+        $('#search-result').html('');
+      });
+    }
+
+    var getSearchFile = function() {
+        var path = "/search.xml";
+        searchFunc(path, 'search-input', 'search-result');
+    }
+  </script>
+
+
+
+
+        
+  <div class="tools-bar-item theme-icon" id="switch-color-scheme">
+    <a href="javascript: void(0)">
+      <i id="theme-icon" class="iconfont icon-moon"></i>
+    </a>
+  </div>
+
+  
+<script src="/js/colorscheme.js"></script>
+
+
+
+
+
+        
+  
+  
+<script src="/js/shares.js"></script>
+
+
+
+      </div>
+    </div>
+  </body>
+</html>
+$resultContent.innerHTML = "<ul><span class='local-search-empty'>No result<span></ul>";
             }
             $resultContent.innerHTML = str;
           });

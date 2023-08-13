@@ -1,0 +1,588 @@
+<!DOCTYPE html>
+<html lang="en" color-mode="light">
+
+  <head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  
+  <meta name="author" content="John Doe" />
+  <meta name="description" content="" />
+  
+  
+  <title>
+    
+      go-面试-数据结构 
+      
+      
+      |
+    
+     陈sir爱狂扁
+  </title>
+
+  
+    <link rel="apple-touch-icon" href="/images/favicon.png">
+    <link rel="icon" href="/images/favicon.png">
+  
+
+  <!-- Raleway-Font -->
+  <link href="https://fonts.googleapis.com/css?family=Raleway&display=swap" rel="stylesheet">
+
+  <!-- hexo site css -->
+  <link rel="stylesheet" href="/css/main.css" />
+  <link rel="stylesheet" href="//at.alicdn.com/t/font_1886449_67xjft27j1l.css" />
+  <!-- 代码块风格 -->
+  
+
+  <!-- jquery3.3.1 -->
+  
+    <script defer type="text/javascript" src="/plugins/jquery.min.js"></script>
+  
+
+  <!-- fancybox -->
+  
+    <link href="/plugins/jquery.fancybox.min.css" rel="stylesheet">
+    <script defer type="text/javascript" src="/plugins/jquery.fancybox.min.js"></script>
+  
+  
+<script src="/js/fancybox.js"></script>
+
+
+  
+
+  
+    <script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+  
+
+  <script>
+    var html = document.documentElement
+    const colorMode = localStorage.getItem('color-mode')
+    if (colorMode) {
+      document.documentElement.setAttribute('color-mode', colorMode)
+    }
+  </script>
+<meta name="generator" content="Hexo 6.3.0"></head>
+
+
+  <body>
+    <div id="app">
+      <div class="header">
+  <div class="avatar">
+    <a href="/">
+      <!-- 头像取消懒加载，添加no-lazy -->
+      
+        <img src="/images/avatar.png" alt="">
+      
+    </a>
+    <div class="nickname"><a href="/">陈sir爱狂扁</a></div>
+  </div>
+  <div class="navbar">
+    <ul>
+      
+        <li class="nav-item" data-path="/">
+          <a href="/">主页</a>
+        </li>
+      
+        <li class="nav-item" data-path="/archives/">
+          <a href="/archives/">归档</a>
+        </li>
+      
+        <li class="nav-item" data-path="/tags/">
+          <a href="/tags/">标签</a>
+        </li>
+      
+        <li class="nav-item" data-path="/friends/">
+          <a href="/friends/">朋友</a>
+        </li>
+      
+        <li class="nav-item" data-path="/about/">
+          <a href="/about/">关于</a>
+        </li>
+      
+    </ul>
+  </div>
+</div>
+
+
+<script src="/js/activeNav.js"></script>
+
+
+
+      <div class="flex-container">
+        <!-- 文章详情页，展示文章具体内容，url形式：https://yoursite/文章标题/ -->
+<!-- 同时为「标签tag」，「朋友friend」，「分类categories」，「关于about」页面的承载页面，具体展示取决于page.type -->
+
+
+  <!-- LaTex Display -->
+
+  
+    <script async type="text/javascript" src="/plugins/mathjax/tex-chtml.js"></script>
+  
+  <script>
+    MathJax = {
+      tex: {
+        inlineMath: [['$', '$'], ['\\(', '\\)']]
+      }
+    }
+  </script>
+
+
+
+
+
+  <!-- clipboard -->
+
+  
+    <script async type="text/javascript" src="/plugins/clipboard.min.js"></script>
+  
+  
+<script src="/js/codeCopy.js"></script>
+
+
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  <!-- 文章内容页 url形式：https://yoursite/文章标题/ -->
+  <div class="container post-details" id="post-details">
+    <div class="post-content">
+      <div class="post-title">go-面试-数据结构</div>
+      <div class="post-attach">
+        <span class="post-pubtime">
+          <i class="iconfont icon-updatetime mr-10" title="Update time"></i>
+          2023-08-13 13:57:17
+        </span>
+        
+              <span class="post-tags">
+                <i class="iconfont icon-tags mr-10" title="Tags"></i>
+                
+                <span class="span--tag mr-8">
+                  <a href="/tags/Golang/" title="Golang">
+                    #Golang
+                  </a>
+                </span>
+                
+                <span class="span--tag mr-8">
+                  <a href="/tags/%E9%9D%A2%E8%AF%95/" title="面试">
+                    #面试
+                  </a>
+                </span>
+                
+              </span>
+          
+      </div>
+      <div class="markdown-body">
+        <p>&emsp;&emsp;&emsp;这是一篇关于golang面试题的文章，主要是记录本人在面试过程中常见的一些题目以及自己认为可能会考察的面试题。当然里面的内容也是用我自己的话术来总结的，可能存在不严谨的地方，还望指出！！！</p>
+<h2 id="数据结构"><a href="#数据结构" class="headerlink" title="数据结构"></a>数据结构</h2><p>&emsp;&emsp;&emsp;面试题中常出现的数据结构 <code>Slice、Map、Channel</code> 这三个。</p>
+<h3 id="Slice"><a href="#Slice" class="headerlink" title="Slice"></a>Slice</h3><figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">type</span> Slice <span class="keyword">struct</span>&#123;</span><br><span class="line">    array   unsafe.Pointer</span><br><span class="line">    <span class="built_in">len</span>     <span class="type">int</span></span><br><span class="line">    <span class="built_in">cap</span>     <span class="type">int</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>从数据结构上看slice很清晰，array指针指向底层数组，len表示切片长度，cap表示切片容量。</p>
+<ul>
+<li>slice扩容<br>使用append向slice追加元素的时候，如果slice空间不足，则会出发扩容。扩容实际上是重新分配一块更大的内存，将原slice的数据拷贝到新的slice，然后返回新的slice，扩容后再把数据追加进去。</li>
+<li>扩容原则<br>如果原slice的容量小于1024，则将slice的容量扩大为原来的2倍<br>如果原slice的容量大于1024，则将slice的容量扩大为原来的1.25倍。</li>
+<li>扩容的思考<br>当切片比较小时，采用较大的扩容倍速，可以避免频繁的扩容，从而减少内存分配的次数和数据拷贝的代价。<br>当切片比较大时，采用较小的扩容倍速，主要是为了避免浪费空间。</li>
+</ul>
+<h3 id="Map"><a href="#Map" class="headerlink" title="Map"></a>Map</h3><figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">type</span> Map <span class="keyword">struct</span> &#123;</span><br><span class="line">    count 		<span class="type">int</span> <span class="comment">//当前保存的元素个数</span></span><br><span class="line">    B 			<span class="type">uint8</span> <span class="comment">//bucket数组的大小</span></span><br><span class="line">    buckets 	unsafe.Pointer <span class="comment">//bucket数组，数组的长度为2^B</span></span><br><span class="line">    oldBuckets 	unsafe.Pointer <span class="comment">//老旧的bucket数组，用于扩容</span></span><br><span class="line">    ...</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>下图展示了一个拥有4个bucket的map<br><img src="/../images/img.png" alt="img.png"><br>在本例子中，hmap.bucket数组的长度是4(2^B)。元素经过Hash运算后将落到某个bucket中进行存储。</p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">type</span> bmap <span class="keyword">struct</span> &#123;</span><br><span class="line">    <span class="comment">//每个bucket可以存储8个键值对</span></span><br><span class="line">    tophash 	[<span class="number">8</span>]<span class="type">uint8</span> <span class="comment">//存储Hash值的高8位</span></span><br><span class="line">    data 		[]<span class="type">byte</span>	<span class="comment">//key value数据：key/key/key/key/....value/value/value/value/...</span></span><br><span class="line">    overflow 	*bmap <span class="comment">//溢出bucket的地址</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>tophash是一个长度为8的整型数组，Hash值相同的键(准确地说是Hash值的低位相同键)存入当前bucket时会将Hash值的高位存储在该数组中，以便后续匹配。<br>data区存放的是key-value数据，存放顺序是key&#x2F;key&#x2F;key&#x2F;….value&#x2F;value&#x2F;value&#x2F;，这样存放是为了节省字节对齐带来的空间浪费。<br>overflow指针指向的是下一个bucket，在此将所有冲突的键连接起来。<br><img src="/../images/mapbucket.png" alt="img.png"></p>
+<ul>
+<li>Hash冲突<br>go采用链地址法来解决冲突，由于每个bucket可以存放8个key-value，所以同一个bucket存放超过8个key-value时就会再创建一个bucket，用类似于链地址法的方式将bucket连接起来。</li>
+<li>负载因子<br><code>负载因子 = 键数量 / bucket数量</code><br>负载因子过小，说明空间利用率低；<br>负载因子过大，说明冲入严重，存取效率低。<br>当负载因子达到6.5的时候才会出发rehash</li>
+<li>扩容<br>1）扩容条件<br>负载因子达到6.5的时候，即平均每个bucket存储的键值对达到6.5个以上；<br>overflow的数量达到2^min(15,B)<br>2）增量扩容<br>当负载因子过大时，就新建一个bucket数组，新的bucket数组是原来的2倍。然后旧bucket数组中的数据搬移到新的bucket数组中去。它的扩容是采用rehash，渐进式扩容。即每次访问map的时候都会出发一次搬迁，每次搬迁2个键值对。<br>扩容细节：显示让hmap数据结构中的oldbuckets成员指向原buckets，然后申请新的buckets数组（长度为原来的2倍），并将数组指针保存到hmap数据结构中的buckets成员中，这样就完成了新老交替，后续的迁移工作是将是从oldbuckets数组中逐步迁移键值对到新的buckets数组中。待oldbuckets数组中所有键值对搬迁完毕后，就可以释放oldbuckets数组了。<br>3）等量扩容<br>所谓的等量扩容，并不是扩大容量，而是bucket数量不变，重新做一遍类似增量扩容的迁移动作，把松散的键值对重新排列一次，以使bucket的使用率更高，进而保证更快的存取速度。<br>在极端情况下，比如经过大量的元素增删后，键值对刚好集中在一小部分bucket中，这样就会造成溢出的bucket数量增多。<br>4）查找过程<br>a.根据key值计算hash值<br>b.取hash值的低位与hmap.B取模来确定bucket的位置。<br>c.取hash值高位，在tophash数组中查询。<br>d.如果tophash[i]中存储的hash值与当前key的hash值相同，则获取tophash[i]的key值进行比较。<br>e.当前bucket没有找到，则依次从溢出的bucket中查找。</li>
+</ul>
+<h3 id="Channel"><a href="#Channel" class="headerlink" title="Channel"></a>Channel</h3><figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">type</span> Map <span class="keyword">struct</span> &#123;</span><br><span class="line">    qcount 		<span class="type">uint</span> <span class="comment">// 当前环形队列中剩余的元素个数</span></span><br><span class="line">    dataqsiz 	<span class="type">uint</span> <span class="comment">// 环形队列的长度，即可以存放的元素个数</span></span><br><span class="line">    buf 		unsafe.Pointer <span class="comment">//环形队列指针</span></span><br><span class="line">    elemesize 	<span class="type">uint16</span> <span class="comment">//每个元素的大小</span></span><br><span class="line">    closed 		<span class="type">uint32</span> <span class="comment">// 标识关闭状态</span></span><br><span class="line">    elemtype 	*_type <span class="comment">//元素类型</span></span><br><span class="line">    sendx 		<span class="type">uint</span> <span class="comment">// 写队列下标，指示元素写入时存放到队列中的位置。</span></span><br><span class="line">    recvx 		<span class="type">uint</span> <span class="comment">// 读队列下标，指示下一个被读取的元素在队列中的位置</span></span><br><span class="line">    recvq 		waitq <span class="comment">// 等待读消息的协程队列</span></span><br><span class="line">    sendq 		waitq <span class="comment">// 等待写消息的协程队列</span></span><br><span class="line">    lock 		sync.Mutex <span class="comment">// 互斥锁，chan不允许并发读写</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>channel的底层是实现了一个环形队列作为缓冲区，datasize记录buf的长度，count记录buf的剩余长度，buf是buf数组的指针，sendx&#x2F;recvx表示队尾和队头，按照这个位置写入和读取，还有sendq和recvq分别是存放读和写的队列。</p>
+<ul>
+<li>向管道写数据<br>如果缓冲区中有空余位置，则将数据写入缓冲区，结束发送过程<br>如果缓冲区中没有空余位置，则将当前协程加入sendq队列，进入睡眠并等待被协程唤醒。</li>
+<li>从管道读数据<br>如果缓冲区中有数据，则从缓冲区中取出数据，结束读取过程。<br>如果缓冲区中没有数据，则将当前协程加入recvq队列，进入睡眠并等待被写协程唤醒。</li>
+<li>从管道中读数据，会阻塞的情况<br>a.管道没有缓冲区<br>b.管道有缓冲区，但缓冲区中没有数据<br>c.管道的值为nil</li>
+<li>往管道中写数据，会阻塞的情况<br>a.管道没有缓冲区<br>b.有缓冲区，但缓冲区已满<br>c.管道的值为nil<br><code>往关闭的管道中写入数据会panic，但可读</code></li>
+</ul>
+<h3 id="数据结构相关问题"><a href="#数据结构相关问题" class="headerlink" title="数据结构相关问题"></a>数据结构相关问题</h3><ol>
+<li>有哪些类型不是并发安全的<br>数组、切片、字典、通道、接口都不是并发安全的。<br>struct 或底层是 struct 的类型并发赋值大部分情况并发不安全，这些类型有：复数、字符串、 数组、切片、字典、通道、接口。因为struct赋值的时候，不是原子操作，各个字段的赋值都是独立的，所以在并发操作的情况下可能会出现异常。解决：我们可以使用 atomic.Value 来保证赋值的并发安全。<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">var</span> v atomic.Value</span><br><span class="line">v.Store(Test&#123;<span class="number">1</span>,<span class="number">2</span>&#125;)</span><br><span class="line">v.Load().(Test)</span><br></pre></td></tr></table></figure>
+字节型、布尔型、整型、浮点型、字符型（安全）<br>文章：<a target="_blank" rel="noopener" href="https://cloud.tencent.com/developer/article/1810536">https://cloud.tencent.com/developer/article/1810536</a></li>
+<li>空结构体的作用<br>首先空结构体不占用内存空间，所以可以用作于占位符，比如我们用map去实现set，那我们就可以将value赋值一个空结构体</li>
+<li>为什么channel是并发安全的<br>因为channel底层在出队，入队的时候也加了锁</li>
+<li>chamnel 有缓冲和无缓冲的区别<br>无缓冲是同步的，例如 make(chan int) ，就是一个送信人去你家门口送信，你不在家他不走，你一定要接下信，他才会走，无缓冲保证信能到你手上。 有缓冲是异步的，例如 make(chan int, 1) ，就是一个送信人去你家仍到你家的信箱，转身就走，除非你的信箱满了，他必须等信箱空下来，有缓冲的保证信能进你家的邮箱。</li>
+<li>init执行顺序？<br>在同一个go文件里，按照定义的顺序执行，在不同文件里的话，按照文件的名称顺序执行</li>
+<li>channel和mutex如何选择<br>分情况选择吧 .首先channel的核心是数据流动，把数据分发给别的协程，而锁则是专注于不流动的数据，某段时间只给一个协程访问数据的权限</li>
+<li>golang的mutex和channel谁的性能更高<br>性能的话 肯定是mutex的更高些的 因为Channel 会使得当前的 Goroutine 让出 cpu 给另一个 Goroutine 获得执行机会，这个上下文的切换周期不低，至少远高于 Mutex 检查竞争状态的成本(后者通常只是一个原子操作)</li>
+<li>make和new的区别</li>
+<li>map如何有序<br>定义一个结构体，key value的结构体 然后可以通过sort包 去实现sort接口，然后就可以做到这个效果了</li>
+</ol>
+<h2 id="内存管理"><a href="#内存管理" class="headerlink" title="内存管理"></a>内存管理</h2><h2 id="并发控制"><a href="#并发控制" class="headerlink" title="并发控制"></a>并发控制</h2><p>并发</p>
+<h2 id="error处理"><a href="#error处理" class="headerlink" title="error处理"></a>error处理</h2>
+      </div>
+      
+        <div class="prev-or-next">
+          <div class="post-foot-next">
+            
+          </div>
+          <div class="post-attach">
+            <span class="post-pubtime">
+              <i class="iconfont icon-updatetime mr-10" title="Update time"></i>
+              2023-08-13 13:57:17
+            </span>
+            
+                  <span class="post-tags">
+                    <i class="iconfont icon-tags mr-10" title="Tags"></i>
+                    
+                    <span class="span--tag mr-8">
+                      <a href="/tags/Golang/" title="Golang">
+                        #Golang
+                      </a>
+                    </span>
+                    
+                    <span class="span--tag mr-8">
+                      <a href="/tags/%E9%9D%A2%E8%AF%95/" title="面试">
+                        #面试
+                      </a>
+                    </span>
+                    
+                  </span>
+              
+          </div>
+          <div class="post-foot-prev">
+            
+              <a href="/2023/03/11/goroutine/" target="_self">
+                <span>Next</span>
+                <i class="iconfont icon-chevronright"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+    </div>
+    
+  <div id="btn-catalog" class="btn-catalog">
+    <i class="iconfont icon-catalog"></i>
+  </div>
+  <div class="post-catalog hidden" id="catalog">
+    <div class="title">Contents</div>
+    <div class="catalog-content">
+      
+        <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84"><span class="toc-text">数据结构</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#Slice"><span class="toc-text">Slice</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Map"><span class="toc-text">Map</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Channel"><span class="toc-text">Channel</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84%E7%9B%B8%E5%85%B3%E9%97%AE%E9%A2%98"><span class="toc-text">数据结构相关问题</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%86%85%E5%AD%98%E7%AE%A1%E7%90%86"><span class="toc-text">内存管理</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%B9%B6%E5%8F%91%E6%8E%A7%E5%88%B6"><span class="toc-text">并发控制</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#error%E5%A4%84%E7%90%86"><span class="toc-text">error处理</span></a></li></ol>
+      
+    </div>
+  </div>
+
+  
+<script src="/js/catalog.js"></script>
+
+
+
+
+    
+      <div class="comments-container">
+        
+
+
+
+
+
+
+
+      </div>
+    
+  </div>
+
+
+        
+<div class="footer">
+  <div class="social">
+    <ul>
+      
+        <li>
+          <a title="github" target="_blank" rel="noopener" href="https://github.com/cheny-alf">
+            <i class="iconfont icon-github"></i>
+          </a>
+        </li>
+      
+    </ul>
+  </div>
+  
+    
+    <div class="footer-more">
+      
+        <a target="_blank" rel="noopener" href="https://github.com/zchengsite/hexo-theme-oranges">Copyright © 2023 Oranges</a>
+        
+    </div>
+  
+    
+    <div class="footer-more">
+      
+        <a target="_blank" rel="noopener" href="https://github.com/zchengsite/hexo-theme-oranges">Theme by Oranges | Powered by Hexo</a>
+        
+    </div>
+  
+  
+    <div class="footer-views">
+      
+          本站总访问量<span id="busuanzi_value_site_pv"></span>次
+        
+      
+          本文总阅读量<span id="busuanzi_value_page_pv"></span>次
+        
+      
+      
+    </div>
+  
+</div>
+
+      </div>
+
+      <div class="tools-bar">
+        <div class="back-to-top tools-bar-item hidden">
+  <a href="javascript: void(0)">
+    <i class="iconfont icon-chevronup"></i>
+  </a>
+</div>
+
+
+<script src="/js/backtotop.js"></script>
+
+
+
+        
+  <div class="search-icon tools-bar-item" id="search-icon">
+    <a href="javascript: void(0)">
+      <i class="iconfont icon-search"></i>
+    </a>
+  </div>
+
+  <div class="search-overlay hidden">
+    <div class="search-content" tabindex="0">
+      <div class="search-title">
+        <span class="search-icon-input">
+          <a href="javascript: void(0)">
+            <i class="iconfont icon-search"></i>
+          </a>
+        </span>
+        
+          <input type="text" class="search-input" id="search-input" placeholder="Search...">
+        
+        <span class="search-close-icon" id="search-close-icon">
+          <a href="javascript: void(0)">
+            <i class="iconfont icon-close"></i>
+          </a>
+        </span>
+      </div>
+      <div class="search-result" id="search-result"></div>
+    </div>
+  </div>
+
+  <script type="text/javascript">
+    var inputArea = document.querySelector("#search-input")
+    var searchOverlayArea = document.querySelector(".search-overlay")
+
+    inputArea.onclick = function() {
+      getSearchFile()
+      this.onclick = null
+    }
+
+    inputArea.onkeydown = function() {
+      if(event.keyCode == 13)
+        return false
+    }
+
+    function openOrHideSearchContent() {
+      let isHidden = searchOverlayArea.classList.contains('hidden')
+      if (isHidden) {
+        searchOverlayArea.classList.remove('hidden')
+        document.body.classList.add('hidden')
+        // inputArea.focus()
+      } else {
+        searchOverlayArea.classList.add('hidden')
+        document.body.classList.remove('hidden')
+      }
+    }
+
+    function blurSearchContent(e) {
+      if (e.target === searchOverlayArea) {
+        openOrHideSearchContent()
+      }
+    }
+
+    document.querySelector("#search-icon").addEventListener("click", openOrHideSearchContent, false)
+    document.querySelector("#search-close-icon").addEventListener("click", openOrHideSearchContent, false)
+    searchOverlayArea.addEventListener("click", blurSearchContent, false)
+
+    var searchFunc = function (path, search_id, content_id) {
+      'use strict';
+      var $input = document.getElementById(search_id);
+      var $resultContent = document.getElementById(content_id);
+      $resultContent.innerHTML = "<ul><span class='local-search-empty'>First search, index file loading, please wait...<span></ul>";
+      $.ajax({
+        // 0x01. load xml file
+        url: path,
+        dataType: "xml",
+        success: function (xmlResponse) {
+          // 0x02. parse xml file
+          var datas = $("entry", xmlResponse).map(function () {
+            return {
+              title: $("title", this).text(),
+              content: $("content", this).text(),
+              url: $("url", this).text()
+            };
+          }).get();
+          $resultContent.innerHTML = "";
+
+          $input.addEventListener('input', function () {
+            // 0x03. parse query to keywords list
+            var str = '<ul class=\"search-result-list\">';
+            var keywords = this.value.trim().toLowerCase().split(/[\s\-]+/);
+            $resultContent.innerHTML = "";
+            if (this.value.trim().length <= 0) {
+              return;
+            }
+            // 0x04. perform local searching
+            datas.forEach(function (data) {
+              var isMatch = true;
+              var content_index = [];
+              if (!data.title || data.title.trim() === '') {
+                data.title = "Untitled";
+              }
+              var orig_data_title = data.title.trim();
+              var data_title = orig_data_title.toLowerCase();
+              var orig_data_content = data.content.trim().replace(/<[^>]+>/g, "");
+              var data_content = orig_data_content.toLowerCase();
+              var data_url = data.url;
+              var index_title = -1;
+              var index_content = -1;
+              var first_occur = -1;
+              // only match artiles with not empty contents
+              if (data_content !== '') {
+                keywords.forEach(function (keyword, i) {
+                  index_title = data_title.indexOf(keyword);
+                  index_content = data_content.indexOf(keyword);
+
+                  if (index_title < 0 && index_content < 0) {
+                    isMatch = false;
+                  } else {
+                    if (index_content < 0) {
+                      index_content = 0;
+                    }
+                    if (i == 0) {
+                      first_occur = index_content;
+                    }
+                    // content_index.push({index_content:index_content, keyword_len:keyword_len});
+                  }
+                });
+              } else {
+                isMatch = false;
+              }
+              // 0x05. show search results
+              if (isMatch) {
+                str += "<li><a href='" + data_url + "' class='search-result-title'>" + orig_data_title + "</a>";
+                var content = orig_data_content;
+                if (first_occur >= 0) {
+                  // cut out 100 characters
+                  var start = first_occur - 20;
+                  var end = first_occur + 80;
+
+                  if (start < 0) {
+                    start = 0;
+                  }
+
+                  if (start == 0) {
+                    end = 100;
+                  }
+
+                  if (end > content.length) {
+                    end = content.length;
+                  }
+
+                  var match_content = content.substr(start, end);
+
+                  // highlight all keywords
+                  keywords.forEach(function (keyword) {
+                    var regS = new RegExp(keyword, "gi");
+                    match_content = match_content.replace(regS, "<span class=\"search-keyword\">" + keyword + "</span>");
+                  });
+
+                  str += "<p class=\"search-result-abstract\">" + match_content + "...</p>"
+                }
+                str += "</li>";
+              }
+            });
+            str += "</ul>";
+            if (str.indexOf('<li>') === -1) {
+              return $resultContent.innerHTML = "<ul><span class='local-search-empty'>No result<span></ul>";
+            }
+            $resultContent.innerHTML = str;
+          });
+        },
+        error: function(xhr, status, error) {
+          $resultContent.innerHTML = ""
+          if (xhr.status === 404) {
+            $resultContent.innerHTML = "<ul><span class='local-search-empty'>The search.xml file was not found, please refer to：<a href='https://github.com/zchengsite/hexo-theme-oranges#configuration' target='_black'>configuration</a><span></ul>";
+          } else {
+            $resultContent.innerHTML = "<ul><span class='local-search-empty'>The request failed, Try to refresh the page or try again later.<span></ul>";
+          }
+        }
+      });
+      $(document).on('click', '#search-close-icon', function() {
+        $('#search-input').val('');
+        $('#search-result').html('');
+      });
+    }
+
+    var getSearchFile = function() {
+        var path = "/search.xml";
+        searchFunc(path, 'search-input', 'search-result');
+    }
+  </script>
+
+
+
+
+        
+  <div class="tools-bar-item theme-icon" id="switch-color-scheme">
+    <a href="javascript: void(0)">
+      <i id="theme-icon" class="iconfont icon-moon"></i>
+    </a>
+  </div>
+
+  
+<script src="/js/colorscheme.js"></script>
+
+
+
+
+
+        
+  
+    <div class="share-icon tools-bar-item">
+      <a href="javascript: void(0)" id="share-icon">
+        <i class="iconfont iconshare"></i>
+      </a>
+      <div class="share-content hidden">
+        
+          <a class="share-item" href="https://twitter.com/intent/tweet?text=' + go-%E9%9D%A2%E8%AF%95-%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84 + '&url=' + https%3A%2F%2Fcheny-alf.github.io%2F2023%2F03%2F10%2Fgo-interview%2F + '" target="_blank" title="Twitter">
+            <i class="iconfont icon-twitter"></i>
+          </a>
+        
+        
+          <a class="share-item" href="https://www.facebook.com/sharer.php?u=https://cheny-alf.github.io/2023/03/10/go-interview/" target="_blank" title="Facebook">
+            <i class="iconfont icon-facebooksquare"></i>
+          </a>
+        
+      </div>
+    </div>
+  
+  
+<script src="/js/shares.js"></script>
+
+
+
+      </div>
+    </div>
+  </body>
+</html>

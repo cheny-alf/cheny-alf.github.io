@@ -11,9 +11,9 @@
   
   <title>
     
-      Category 
+      go-面试-协程 
       
-       : Golang
+      
       |
     
      陈sir爱狂扁
@@ -108,30 +108,169 @@
 
 
       <div class="flex-container">
-        <!-- 标签详情页，展示某个标签下的文章列表，url形式：https://yoursite/tags/某个标签/ -->
+        <!-- 文章详情页，展示文章具体内容，url形式：https://yoursite/文章标题/ -->
+<!-- 同时为「标签tag」，「朋友friend」，「分类categories」，「关于about」页面的承载页面，具体展示取决于page.type -->
 
-<div class="container category-details">
-  <div class="content-title">
-    <h2>
-      <span>Golang</span>
-    </h2>
-  </div>
+
+  <!-- LaTex Display -->
+
   
-    <div class="post-list">
-      <div class="post-item" title="基于 Redis 实现的支持延时/定时投递的消息队列">
-        <span class="time-m-d">2023-04-10</span>
-        <a href="/2023/04/10/delay-queue/">
-          <span>基于 Redis 实现的支持延时/定时投递的消息队列</span>
-        </a>
+    <script async type="text/javascript" src="/plugins/mathjax/tex-chtml.js"></script>
+  
+  <script>
+    MathJax = {
+      tex: {
+        inlineMath: [['$', '$'], ['\\(', '\\)']]
+      }
+    }
+  </script>
+
+
+
+
+
+  <!-- clipboard -->
+
+  
+    <script async type="text/javascript" src="/plugins/clipboard.min.js"></script>
+  
+  
+<script src="/js/codeCopy.js"></script>
+
+
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  <!-- 文章内容页 url形式：https://yoursite/文章标题/ -->
+  <div class="container post-details" id="post-details">
+    <div class="post-content">
+      <div class="post-title">go-面试-协程</div>
+      <div class="post-attach">
+        <span class="post-pubtime">
+          <i class="iconfont icon-updatetime mr-10" title="Update time"></i>
+          2023-08-13 13:57:17
+        </span>
+        
+              <span class="post-tags">
+                <i class="iconfont icon-tags mr-10" title="Tags"></i>
+                
+                <span class="span--tag mr-8">
+                  <a href="/tags/Golang/" title="Golang">
+                    #Golang
+                  </a>
+                </span>
+                
+                <span class="span--tag mr-8">
+                  <a href="/tags/%E9%9D%A2%E8%AF%95/" title="面试">
+                    #面试
+                  </a>
+                </span>
+                
+              </span>
+          
       </div>
+      <div class="markdown-body">
+        <p>&emsp;&emsp;&emsp;这是一篇关于golang面试题的文章，主要是记录本人在面试过程中常见的一些题目以及自己认为可能会考察的面试题。当然里面的内容也是用我自己的话术来总结的，可能存在不严谨的地方，还望指出！！！</p>
+<h2 id="协程"><a href="#协程" class="headerlink" title="协程"></a>协程</h2><ol>
+<li>进程、线程、协程<br>进程是应用程序的启动实例，每个进程都有独立的内存空间，不同进程通过进程间通信方式来通信<br>线程是从属于进程，每个进程至少包含1个线程，线程是cpu调度的基本单位，多个线程之间可以共享进程的资源并通过共享内存等线程间通信的方式来通信<br>协程是可以理解为轻量级的线程，与线程相比，协程不受操作系统调度，协程调度器是由应用程序提供，协程调度器按照调度策略把协程调度到线程中运行。</li>
+<li>GMP模型<br>G-协程 M-工作线程 P-处理器<br>M必须持有P才可以进行调度，P的个数默认和cpu个数一样，可以通过setGoMaxProcs()指定P的个数，同时每个M都有一个G0进行协程调度。<br><img src="/../images/gmp.png" alt="img_1.png"><br>上图中包括两个工作线程M，每个M持有一个处理器P，并且每个M中有一个协程G在运行。灰色背景的协程正在等待被调度，他们位于被称为runqueues的队列中。每个处理器P中又有一个本地runqueue队列，此外还有一个全局的runqueue队列，由多个处理器共享。</li>
+<li>调度策略</li>
+</ol>
+<ul>
+<li>队列轮转<br>每个P都维护着一个本地的runqueue，P依次调用G并执行</li>
+<li>系统调用<br><img src="/../images/gmp2.png" alt="img.png"><br>如上图所示，当GO即将进人系统调用时，MO将释放P，进而某个冗余的M1获取P，继续执行P队列中剩下的G。MO由于陷人系统调用而被阻塞，M1接MO的工作，只要P不空闲，就可以保证充分地利用CPU。执行完系统调用之后，会看M能不能获取到P,对G0进行不同对处理<br>a.如果有空闲P，则获取一个P，继续执行G0<br>b.如果没有空闲P,则将G0放入全局队列，等待被其他的P调度</li>
+<li>工作量偷取<br>当P中没有协程需要调度，会看全局队列中是否有G待执行，没有的话，从其他P的队列中拿一半的G去执行</li>
+<li>抢占式调度<br>调度器会监控每个协程的执行时间，一但执行时间过长且有其他但协程在等待执行时，会把协程暂停，转而调度等待的协程，以达到类似于时间片轮转的效果。<br>学习连接：<a target="_blank" rel="noopener" href="https://learnku.com/articles/41728">https://learnku.com/articles/41728</a></li>
+</ul>
+
+      </div>
+      
+        <div class="prev-or-next">
+          <div class="post-foot-next">
+            
+              <a href="/2023/03/10/go-interview/" target="_self">
+                <i class="iconfont icon-chevronleft"></i>
+                <span>Prev</span>
+              </a>
+            
+          </div>
+          <div class="post-attach">
+            <span class="post-pubtime">
+              <i class="iconfont icon-updatetime mr-10" title="Update time"></i>
+              2023-08-13 13:57:17
+            </span>
+            
+                  <span class="post-tags">
+                    <i class="iconfont icon-tags mr-10" title="Tags"></i>
+                    
+                    <span class="span--tag mr-8">
+                      <a href="/tags/Golang/" title="Golang">
+                        #Golang
+                      </a>
+                    </span>
+                    
+                    <span class="span--tag mr-8">
+                      <a href="/tags/%E9%9D%A2%E8%AF%95/" title="面试">
+                        #面试
+                      </a>
+                    </span>
+                    
+                  </span>
+              
+          </div>
+          <div class="post-foot-prev">
+            
+              <a href="/2023/03/13/memorymange/" target="_self">
+                <span>Next</span>
+                <i class="iconfont icon-chevronright"></i>
+              </a>
+            
+          </div>
+        </div>
+      
     </div>
+    
+  <div id="btn-catalog" class="btn-catalog">
+    <i class="iconfont icon-catalog"></i>
+  </div>
+  <div class="post-catalog hidden" id="catalog">
+    <div class="title">Contents</div>
+    <div class="catalog-content">
+      
+        <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%8D%8F%E7%A8%8B"><span class="toc-text">协程</span></a></li></ol>
+      
+    </div>
+  </div>
+
   
-  <nav class="post-navigation">
+<script src="/js/catalog.js"></script>
+
+
+
+
     
-    <span class="page-num">1 / 1</span>
+      <div class="comments-container">
+        
+
+
+
+
+
+
+
+      </div>
     
-  </nav>
-</div>
+  </div>
+
 
         
 <div class="footer">
@@ -397,6 +536,24 @@
 
 
         
+  
+    <div class="share-icon tools-bar-item">
+      <a href="javascript: void(0)" id="share-icon">
+        <i class="iconfont iconshare"></i>
+      </a>
+      <div class="share-content hidden">
+        
+          <a class="share-item" href="https://twitter.com/intent/tweet?text=' + go-%E9%9D%A2%E8%AF%95-%E5%8D%8F%E7%A8%8B + '&url=' + https%3A%2F%2Fcheny-alf.github.io%2F2023%2F03%2F11%2Fgoroutine%2F + '" target="_blank" title="Twitter">
+            <i class="iconfont icon-twitter"></i>
+          </a>
+        
+        
+          <a class="share-item" href="https://www.facebook.com/sharer.php?u=https://cheny-alf.github.io/2023/03/11/goroutine/" target="_blank" title="Facebook">
+            <i class="iconfont icon-facebooksquare"></i>
+          </a>
+        
+      </div>
+    </div>
   
   
 <script src="/js/shares.js"></script>
