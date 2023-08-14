@@ -157,7 +157,7 @@
       <div class="post-attach">
         <span class="post-pubtime">
           <i class="iconfont icon-updatetime mr-10" title="Update time"></i>
-          2023-08-13 13:58:31
+          2023-08-13 15:20:33
         </span>
         
               <span class="post-tags">
@@ -180,7 +180,20 @@
       </div>
       <div class="markdown-body">
         <p>&emsp;&emsp;&emsp;这是一篇关于golang面试题的文章，主要是记录本人在面试过程中常见的一些题目以及自己认为可能会考察的面试题。当然里面的内容也是用我自己的话术来总结的，可能存在不严谨的地方，还望指出！！！</p>
-<h2 id="内存管理"><a href="#内存管理" class="headerlink" title="内存管理"></a>内存管理</h2>
+<h2 id="内存管理"><a href="#内存管理" class="headerlink" title="内存管理"></a>内存管理</h2><ol>
+<li>内存分配<br>首先Go程序启动的时候会申请一个比较大的内存，然后把这个分成<code>spans、bitmap、arena区</code>，arena区也就是堆区，spans和bitmap是用来管理arena，span是内存管理的基本单元，用于管理特定的class对象，class对象是一开始已经计算好、存储好的变量，记录来对应大小的<code>classID</code>，然后小对象类型的堆对象就会根据它的大小，分配到对应设定好的mspan上分配内存，然后就要有一个数据结构来挂你这个span，就是<code>mcnetral</code>.<br>各个线程需要内存的时候就从mcentral的span中申请内存，为了避免多线程竞争，导致不停的加锁的情况，Go为每个线程分配了span缓存，就是<code>mcache</code>.<br>mchche中如果没有的话再去mcentral中申请，mcentral的数据结构是有个属性是记录classID，所以他是管理特定的class的span，也就是每个class都会有一个mcentral,这个mcentral的集合存放在mheap中，mheap也就是管理全部的内存，然后刚刚在mcentral中申请不到可用的span，就是从mheap中申请一个新的span。</li>
+<li>垃圾回收<br>Go采用的是三色标记法，采用的回收算法是标记清楚算法，垃圾回收时，从root对象节点扫描，第一次扫描完把root对象标记为黑色，把root对象引用的对象标记为灰色，其余为白色，然后再以灰色的对象继续往下扫描，直到没有其他引用，然后白色对象会被回收，黑色保留，在垃圾回收的时候会stw，会停掉所有的goroutine，专心做回收，等垃圾回收结束后再恢复goroutine</li>
+<li>写屏障<br>类似一个开关，在GC的特定时刻开启，开启后指针传递会标记指针，即本轮不再回收，下次GC的时候再确定</li>
+<li>触发GC时机<br>a.达到阈值（每当内存扩大一倍时）<br>b.每2分钟触发一次<br>c.runtime.gc来手动触发。</li>
+<li>逃逸分析<br>决定内存是要分配在堆上还是栈上</li>
+<li>逃逸分析的情况</li>
+</ol>
+<ul>
+<li>指针逃逸，返回局部变量的指针</li>
+<li>栈空间不足逃逸：比如当前存放一个length为10000的int切片或者无法在编译时判断当前切片的长度</li>
+<li>动态类型逃逸：函数的参数为interface类型，无法在编译期间确定其参数类型</li>
+</ul>
+
       </div>
       
         <div class="prev-or-next">
@@ -195,7 +208,7 @@
           <div class="post-attach">
             <span class="post-pubtime">
               <i class="iconfont icon-updatetime mr-10" title="Update time"></i>
-              2023-08-13 13:58:31
+              2023-08-13 15:20:33
             </span>
             
                   <span class="post-tags">
