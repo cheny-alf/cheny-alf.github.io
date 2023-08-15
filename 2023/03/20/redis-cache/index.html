@@ -1,0 +1,618 @@
+<!DOCTYPE html>
+<html lang="en" color-mode="light">
+
+  <head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  
+  <meta name="author" content="John Doe" />
+  <meta name="description" content="" />
+  
+  
+  <title>
+    
+      redis-面试-持久化、淘汰策略等 
+      
+      
+      |
+    
+     陈sir爱狂扁
+  </title>
+
+  
+    <link rel="apple-touch-icon" href="/images/favicon.png">
+    <link rel="icon" href="/images/favicon.png">
+  
+
+  <!-- Raleway-Font -->
+  <link href="https://fonts.googleapis.com/css?family=Raleway&display=swap" rel="stylesheet">
+
+  <!-- hexo site css -->
+  <link rel="stylesheet" href="/css/main.css" />
+  <link rel="stylesheet" href="//at.alicdn.com/t/font_1886449_67xjft27j1l.css" />
+  <!-- 代码块风格 -->
+  
+
+  <!-- jquery3.3.1 -->
+  
+    <script defer type="text/javascript" src="/plugins/jquery.min.js"></script>
+  
+
+  <!-- fancybox -->
+  
+    <link href="/plugins/jquery.fancybox.min.css" rel="stylesheet">
+    <script defer type="text/javascript" src="/plugins/jquery.fancybox.min.js"></script>
+  
+  
+<script src="/js/fancybox.js"></script>
+
+
+  
+
+  
+    <script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+  
+
+  <script>
+    var html = document.documentElement
+    const colorMode = localStorage.getItem('color-mode')
+    if (colorMode) {
+      document.documentElement.setAttribute('color-mode', colorMode)
+    }
+  </script>
+<meta name="generator" content="Hexo 6.3.0"></head>
+
+
+  <body>
+    <div id="app">
+      <div class="header">
+  <div class="avatar">
+    <a href="/">
+      <!-- 头像取消懒加载，添加no-lazy -->
+      
+        <img src="/images/avatar.png" alt="">
+      
+    </a>
+    <div class="nickname"><a href="/">陈sir爱狂扁</a></div>
+  </div>
+  <div class="navbar">
+    <ul>
+      
+        <li class="nav-item" data-path="/">
+          <a href="/">主页</a>
+        </li>
+      
+        <li class="nav-item" data-path="/archives/">
+          <a href="/archives/">归档</a>
+        </li>
+      
+        <li class="nav-item" data-path="/tags/">
+          <a href="/tags/">标签</a>
+        </li>
+      
+        <li class="nav-item" data-path="/friends/">
+          <a href="/friends/">朋友</a>
+        </li>
+      
+        <li class="nav-item" data-path="/about/">
+          <a href="/about/">关于</a>
+        </li>
+      
+    </ul>
+  </div>
+</div>
+
+
+<script src="/js/activeNav.js"></script>
+
+
+
+      <div class="flex-container">
+        <!-- 文章详情页，展示文章具体内容，url形式：https://yoursite/文章标题/ -->
+<!-- 同时为「标签tag」，「朋友friend」，「分类categories」，「关于about」页面的承载页面，具体展示取决于page.type -->
+
+
+  <!-- LaTex Display -->
+
+  
+    <script async type="text/javascript" src="/plugins/mathjax/tex-chtml.js"></script>
+  
+  <script>
+    MathJax = {
+      tex: {
+        inlineMath: [['$', '$'], ['\\(', '\\)']]
+      }
+    }
+  </script>
+
+
+
+
+
+  <!-- clipboard -->
+
+  
+    <script async type="text/javascript" src="/plugins/clipboard.min.js"></script>
+  
+  
+<script src="/js/codeCopy.js"></script>
+
+
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  <!-- 文章内容页 url形式：https://yoursite/文章标题/ -->
+  <div class="container post-details" id="post-details">
+    <div class="post-content">
+      <div class="post-title">redis-面试-持久化、淘汰策略等</div>
+      <div class="post-attach">
+        <span class="post-pubtime">
+          <i class="iconfont icon-updatetime mr-10" title="Update time"></i>
+          2023-08-15 19:26:05
+        </span>
+        
+              <span class="post-tags">
+                <i class="iconfont icon-tags mr-10" title="Tags"></i>
+                
+                <span class="span--tag mr-8">
+                  <a href="/tags/Redis/" title="Redis">
+                    #Redis
+                  </a>
+                </span>
+                
+                <span class="span--tag mr-8">
+                  <a href="/tags/%E9%9D%A2%E8%AF%95/" title="面试">
+                    #面试
+                  </a>
+                </span>
+                
+              </span>
+          
+      </div>
+      <div class="markdown-body">
+        <h2 id="内存淘汰策略"><a href="#内存淘汰策略" class="headerlink" title="内存淘汰策略"></a>内存淘汰策略</h2><p>Redis 中提供了 8 种内存淘汰策略：</p>
+<ul>
+<li>volatile-lru：针对设置了过期时间的 key，使用 LRU 算法进行淘汰</li>
+<li>allkeys-lru：针对所有 key 使用 LRU 算法进行淘汰</li>
+<li>volatile-lfu：针对设置了过期时间的 key，使用 LFU 算法进行淘汰</li>
+<li>allkeys-lfu：针对所有 key 使用 LFU 算法进行淘汰</li>
+<li>volatile-random: 从设置了过期时间的 key 中随机删除</li>
+<li>allkeys-random: 从所有 key 中随机删除</li>
+<li>volatile-ttl：删除最近过期的 key</li>
+<li>noeviction（默认策略）：不删除 key，返回 OOM 错误，只能读取不能写入</li>
+</ul>
+<p>Redis中采用的LRU算法是<strong>近似LRU算法</strong>，首先LRU是证选择最久未访问的 key 进行淘汰，近似 LRU 算法是对少量 key 进行采样（默认为 5 个），将采样 key 放入一个淘汰池中，淘汰池默认最多存储 16 个 key，每轮淘汰循环淘汰采样 key 中访问时间最早的 key，直到释放足够的内存空间。Redis不使用真正的 LRU 实现的原因是真正的 LRU 实现需要更多的内存。（终究还是内存太贵啊~）</p>
+<p>Redis中采用的LFU算法是<strong>近似LFU算法</strong>,在 LFU 模式下，Redis 会尝试跟踪记录 key 的访问频率，因此将很少使用的 key 淘汰。这意味着经常使用的 key 更有可能保留在内存中。<strong>LFU 近似算法</strong>：它使用 “Morris 计数器” 近似计数算法来估计对象访问频率，核心思想就是令访问频率+1 是有概率的，且访问频率越高时要 +1 概率越小。</p>
+<p>为什么 Redis 需要<strong>淘汰池</strong>？<br>淘汰池，用于存储采样到的样本。对于lru,lfu,ttl类型的淘汰策略，会为采样出来的 key 计算一个评估用的值，取名为 idle。lru 的 idle 是当前和最后一次访问的时间间隔，lfu 的 idle 需要根据当前和最后一次访问的时间间隔和对象的访问频度来做计算，而 ttl 的 idle 就是距离过期时间还有多少毫秒，总的来说， idle 越小则表示 key 越热。当淘汰池满了，会淘汰 idle 最小的数据，也就是将下标为 0 的样本从淘汰池中移除掉，其余样本向前移动一个位置。淘汰池按 idle 升序排列，每次采样结束后，从淘汰池末尾开始向前遍历，找到idle 最大的 key 并将它删除。<br>具体是什么作用呢？<strong>1. 提升淘汰的精准度：</strong> 当进行过几轮淘汰后，淘汰池将会被装满，每次淘汰能进行比较的样本数就变多了。那么样本数越多，当然淘汰越精准。<strong>2. 提升性能</strong>： 淘汰池是一种空间换时间的操作。假如没有淘汰池，那么需要提高每轮采样数才能取得很好的淘汰精准度，而每轮采样数调整得越多，性能也就越差。而淘汰池的存在能让每轮少量采样到后面也能得到很好的淘汰精准度，并不需要提高每轮采样数，从而也就节省了每轮淘汰开销，从另一个角度来说就是提升了性能。</p>
+<h2 id="过期Key的删除策略"><a href="#过期Key的删除策略" class="headerlink" title="过期Key的删除策略"></a>过期Key的删除策略</h2><p>定时删除：在设置 key 的过期时间时，同时创建一个定时事件，当时间到达时，由事件处理器自动执行 key 的删除操作。<br>惰性删除；不主动删除过期键，每次从数据库访问 key 时，都检测 key 是否过期，如果过期则删除该 key。<br>定期删除；每隔一段时间「随机」从数据库中取出一定数量的 key 进行检查，并删除其中的过期key。</p>
+<p>为什么删除了很多 key 内存占用还是很高？</p>
+<ul>
+<li>如果使用了 unlink 进行删除，那么很可能是因为大部分 key 的内存还未来得及被异步回收。</li>
+<li>如果使用了 del 进行删除，内存占用仍然还是很高，那么可能配置项 <code>lazyfree_lazy_user_del</code> 不为 0，此时 del 也会使用懒惰删除的方式，那么原因就可能和上面说的一样了。</li>
+</ul>
+<h2 id="缓存穿透，缓存击穿，缓存雪崩问题"><a href="#缓存穿透，缓存击穿，缓存雪崩问题" class="headerlink" title="缓存穿透，缓存击穿，缓存雪崩问题"></a>缓存穿透，缓存击穿，缓存雪崩问题</h2><ol>
+<li><strong><em>缓存穿透</em></strong><br>什么是缓存穿透： 用户查询不存在的数据。<br>缓存穿透会有什么问题： 如果出现大量查询不存在数据的请求，轻则增加数据库压力，重则将数据库打 垮。<br>解决方案：</li>
+</ol>
+<ul>
+<li>校验参数： 适用于能够界定一个合法查询范围的场景，直接屏蔽范围外的非法参数。</li>
+<li>缓存空值： 这是一种通用的做法，把查询结果为空值的参数也缓存下来，下次查询时就可以直接从缓存取出空值返回。</li>
+<li>布隆过滤器<br><strong><em>缓存击穿</em></strong><br>什么是缓存击穿： 用户查询缓存已失效的数据。<br>缓存击穿会有什么问题： 如果出现大量查询缓存已失效的数据，轻则增加数据库压力，重则将数据库打垮。<br>解决方案：</li>
+<li>分布式锁： 当查询发现缓存不存在时，在缓存中设置关于该 key 的分布式锁，从数据库查询到结果并更新缓存后解锁。在第一个查询解锁之前，其余查询相同 key 的线程只能阻塞等待解锁，此时解锁后可以直接从缓存获取数据。</li>
+<li>热点缓存不过期： 如果能发现什么数据是热点的话，可以不设置过期时间。比如做社交平台的话，我们可以让百万粉丝以上大 v 的用户信息等缓存不会过期。</li>
+<li>续期： 缓存被访问时我们就为它进行续期，也可以访问次数到一个阈值后再进行续期，从而让热点缓存不要失效。（但是冷门数据过期后，突然有大量查询的场景这个方案是防不住的）<br><strong><em>缓存雪崩</em></strong><br>什么是缓存雪崩： 大量热点数据同时失效。<br>缓存雪崩会有什么问题： 如果出现大量热点数据同时失效，随后这些热点数据还在被大量查询，轻则增加数据库压力，重则将数据库打垮。<br>解决方案：</li>
+<li>分布式锁： 讲过啦！</li>
+<li>热点缓存不过期： 讲过啦！</li>
+<li>续期： 讲过啦！</li>
+<li>过期时间加随机数： 更新缓存并设置过期时间的时候，不要固定过期时间，选用一个固定值 + 随机值，让缓存不要在同一时间过期。</li>
+</ul>
+<h2 id="持久化"><a href="#持久化" class="headerlink" title="持久化"></a>持久化</h2><ol>
+<li>RDB(Redis Database)是 Redis 的持久化机制之一，中文一般叫它内存快照。<br><strong>RDB 存储形式</strong>： RDB 是以二进制形式存储数据的。<br><strong>RDB 生成时机</strong>： RDB 可以执行 SAVE（同步保存） 或者 BGSAVE（创建子进程后台保存）命令主动开始 RDB 的持久化过程。除此之外，RDB 还有被动持久化策略，被动持久化是由服务器定时任务（ServerCron）检查并执行的，该策略可以自己在 redis.conf 配置文件中进行配置，默认被动持久化时机如下：</li>
+</ol>
+<ul>
+<li>900 秒内发生 1 次修改，距离上次保存超过 900 秒后则创建子进程进行 RDB 持久化。</li>
+<li>300 秒内发生 10 次修改，距离上次保存超过 300 秒后则创建子进程进行 RDB 持久化。</li>
+<li>60 秒内发生 10000 次修改，距离上次保存超过 60 秒后则创建子进程进行 RDB 持久化。<br><strong>RDB 如何存储</strong>： RDB 存储时首先创建一个临时文件，先写入 REDIS + RDB 版本号，再写入一些关于服务器当前状态和 RDB 文件的辅助信息，之后遍历所有数据库（Redis 有 16 个库）里的键值对，为每个键值对选择合适的编码，能压缩存储的就压缩，将它们以二进制形式写入 RDB 临时文件。<br><strong>RDB 生成时写入数据怎么办</strong>： 这个问题实际上是操作系统解决的，操作系统用的是写时复制（Copy-On-Write） 机制，父子进程共享的内存是只读的，如果哪一个进程要写入，则会将发生写入的页拷贝一份（谁写谁拷贝），修改自己的页表内容，之后在拷贝的页上修改数据。RDB 生成在 COW 机制下，父进程最多会复制一倍的内存。<br><strong>RDB 的优点：</strong></li>
+<li>RDB 以二进制形式存储数据，并且尽量选择压缩数据存储，所以 RDB 文件一个优点是节省空间。</li>
+<li>RDB 是数据库在某个时刻的内存快照，恢复速度快。<br><strong>RDB 的缺点：</strong></li>
+<li>由于 COW 机制的存在，如果在后台生成 RDB 时写入数据较多会比较消耗性能和内存空间。</li>
+<li>RDB 被动持久化策略会有丢失部分新数据的风险。 虽然可以自己配置策略，但一般也不会令 RDB 持久化得太频繁，生成越频繁性能越差。</li>
+</ul>
+<ol start="2">
+<li>AOF（Append-Only-Files） 是可以看作是一种增量日志文件，日志的内容是以 RESP 协议格式（Redis 设计的网络传输格式）保存的写命令。默认不开启 AOF 持久化，需要修改配置文件开启。<br>**<em>AOF 写入时机</em>**： 每次执行完写操作的命令都会将该命令以 RESP 协议格式写入 AOF 缓冲区。<br>always：(每次执行完都写入)Redis 在每轮事件循环的前置处理函数中，将 AOF 缓冲区中的所有内容通过 write 系统调用函数追加写入 AOF 文件（此时在内核缓冲区），随后立即调用 fsync 系统调用函数将内核缓冲区的内容刷盘。该策略可靠性最好，但是性能最低。<br>everysec：(每秒写入)Redis 在每轮事件循环的前置处理函数中，将 AOF 缓冲区中的内容通过 write 系统调用函数追加写入 AOF 文件（此时在内核缓冲区），如果距离上次刷盘超过 1s ，就向 AOF FSYNC 类型的后台线程提交一个刷盘任务。everysec 是默认 AOF 刷盘策略，该策略在性能和可靠性都是适中的。<br>no： (不主动写入)Redis 在每轮事件循环的前置处理函数中，将 AOF 缓冲区中的内容通过 write 系统调用函数追加写入 AOF 文件（此时在内核缓冲区），不主动调用 fsync，让刷盘时机由操作系统控制。性能最好，可靠性最低。<br>**<em>AOF 重写</em>**： 创建一个子进程，创建一个临时文件，遍历每个数据库，分析每个键值对的内容和状态，用对应的设置命令写入临时文件。临时文件写完后，用配置的 AOF 文件名将其重命名，最后关闭子进程。<br><strong>AOF 需要重写的原因：</strong> AOF 文件记录了很多写命令，其中可能有很多是针对同个 key 的写命令，但是一般来说只有最后一次修改有效，所以我们记录了很多无效命令，这会导致占用很多的内存空间。所以 AOF重写的好处就是能够节省 AOF 文件的占用空间，同时剔除了无效命令还能使恢复速度加快。<br><strong>AOF 重写时机：</strong></li>
+</ol>
+<ul>
+<li>使用 BGREWRITEAOF 命令主动执行后台重写。</li>
+<li>AOF 文件占用空间到达上次重写的 2 倍，被动执行后台重写。<br>注：AOF 重写时如果父进程有数据写入，那么也是通过写时复制机制来保证数据安全的。还有，AOF 只有后台进程重写，没有在主进程重写的。<br>_AOF 的优点_：<br>AOF 数据完整性较 RDB 更好。<br><em>AOF 的缺点：</em><br>AOF 文件记录写命令，并不使用二进制形式和压缩存储，占用空间较大。<br>AOF 机制下通过执行记录的命令来进行数据恢复，恢复速度较慢。</li>
+</ul>
+<ol start="3">
+<li>混合持久化：混合持久化是 Redis 4.0 推出的功能，它是在 AOF 文件里前面存储 RDB 格式数据，后面存储 AOF 格式数据。 数据恢复的时候先根据 RDB 部分快速恢复，再根据 AOF 部分靠执行命令恢复数据。</li>
+<li>MP-AOF（Multi Part-AOF）是 Redis 7 推出的 AOF 机制。它将 AOF 分成了四类文件：<br>基本文件（Base）： Base 文件是执行 AOF 重写生成的文件，有 RDB 和 AOF 两种格式，默认是生成RDB 文件，清单文件中只会有一个 Base 文件。Base 文件名格式为： {配置 AOF 文件名}.{序列号}.base.rdb 或 {配置 AOF 文件名}.{序列号}.base.aof 。（感觉基本文件叫起来很怪，所以直接叫Base）<br>增量文件（Incr）： Incr 文件是最近一次 AOF 重写后记录的所有写命令。清单文件中可能会有多个Incr 文件，Incr 文件在 AOF 重写时创建，但如果 AOF 重写中途中止了，重试重写的时候又会创建一个 Incr文件来记录新的写命令。Incr 文件名格式为： {配置 AOF 文件名}.{序列号}.incr.aof 。（我们提到增量文件也不用中文名，而是说 Incr）<br>历史文件（History）： 当 AOF 重写成功之后，之前的 base 和 incr 文件将成为历史文件。 历史文件会通过后台线程异步删除。<br>清单文件（Manifest）： 清单文件用于跟踪和管理其余类型的文件，记录格式为： <code>file &#123;文件名&#125; seq &#123;序列号&#125; type &#123;文件类型首字母&#125; </code>。<br><strong>MP-AOF 解决什么问题：</strong></li>
+</ol>
+<ul>
+<li>减少 AOF 重写期间记录写命令带来的内存开销： 之前的 AOF 机制如果在 AOF 重写期间收到写命令，是将这些命令存储在内存中，待重写完成后再把这些命令追加写入 AOF 文件。那么，如果重写期间收到大量写命令的话，存储这些命令将是一笔不小的内存开销。而 MP-AOF 在 AOF 重写期间是创建了一个新的Incr 文件，用来记录重写期间以及之后收到的写命令，于是就减少了内存开销。</li>
+<li>减少 AOF 重写时的硬盘 IO 次数： 之前的 AOF 机制为了尽量减少重写完成后，重写期间的写命令占用内存太多，所以会让执行 AOF 重写的子进程把一些重写期间的写命令写入文件，子进程完成重写任务后调用 fsync 刷盘并关闭文件，AOF 重写完成后再将剩余的命令写入重写后的文件，最后再调用一次 fsync 保证落盘。所以和 MP-AOF 在重写期间专门创建一个 Incr 文件来写入命令相比，旧机制硬盘 IO 次数更多了。</li>
+<li>AOF 重写完成后不造成主进程阻塞： 之前的 AOF 机制由于将重写期间的写命令存到内存，那么重写完成后需要把内存中剩余的命令追加写入 AOF 文件并调用 fsync 刷盘，如果需要写的命令很多则可能会导致主进程阻塞。而 MP-AOF 在重写期间创建一个新的 Incr 文件来记录之后的写命令，和平时的 AOF 文件一样边写边刷盘（和配置的持久化策略有关），不会重写完成时突然要将大量命令写入文件中。</li>
+</ul>
+<p><strong>AOF 开启了 always 策略能保证命令一定都落盘吗？</strong><br>很遗憾，并不能。首先，写 AOF 缓冲区，AOF 写文件 + 刷盘和执行命令这三样就不在同一个函数里,写 AOF 缓冲区是执行完命令之后，AOF 写文件 + 刷盘时机是每一轮事件循环的前置处理函数，虽然执行完命令到刷盘这个时间间隔很短很短，但是从理论上讲这个时候宕机还是会丢数据的。如果说已经调用 write写入内核缓冲区了，操作系统没挂后面还能让操作系统自动 fsync 刷盘，但是调用 write 之前已经挂了就没救了。同时不止是考虑这个时间间隔，fsync 之后就把事情交给硬件了，有没有成功落盘也要考虑硬件因素。</p>
+
+      </div>
+      
+        <div class="prev-or-next">
+          <div class="post-foot-next">
+            
+              <a href="/2023/03/15/handelerr/" target="_self">
+                <i class="iconfont icon-chevronleft"></i>
+                <span>Prev</span>
+              </a>
+            
+          </div>
+          <div class="post-attach">
+            <span class="post-pubtime">
+              <i class="iconfont icon-updatetime mr-10" title="Update time"></i>
+              2023-08-15 19:26:05
+            </span>
+            
+                  <span class="post-tags">
+                    <i class="iconfont icon-tags mr-10" title="Tags"></i>
+                    
+                    <span class="span--tag mr-8">
+                      <a href="/tags/Redis/" title="Redis">
+                        #Redis
+                      </a>
+                    </span>
+                    
+                    <span class="span--tag mr-8">
+                      <a href="/tags/%E9%9D%A2%E8%AF%95/" title="面试">
+                        #面试
+                      </a>
+                    </span>
+                    
+                  </span>
+              
+          </div>
+          <div class="post-foot-prev">
+            
+              <a href="/2023/03/20/redis/" target="_self">
+                <span>Next</span>
+                <i class="iconfont icon-chevronright"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+    </div>
+    
+  <div id="btn-catalog" class="btn-catalog">
+    <i class="iconfont icon-catalog"></i>
+  </div>
+  <div class="post-catalog hidden" id="catalog">
+    <div class="title">Contents</div>
+    <div class="catalog-content">
+      
+        <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%86%85%E5%AD%98%E6%B7%98%E6%B1%B0%E7%AD%96%E7%95%A5"><span class="toc-text">内存淘汰策略</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E8%BF%87%E6%9C%9FKey%E7%9A%84%E5%88%A0%E9%99%A4%E7%AD%96%E7%95%A5"><span class="toc-text">过期Key的删除策略</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E7%BC%93%E5%AD%98%E7%A9%BF%E9%80%8F%EF%BC%8C%E7%BC%93%E5%AD%98%E5%87%BB%E7%A9%BF%EF%BC%8C%E7%BC%93%E5%AD%98%E9%9B%AA%E5%B4%A9%E9%97%AE%E9%A2%98"><span class="toc-text">缓存穿透，缓存击穿，缓存雪崩问题</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E6%8C%81%E4%B9%85%E5%8C%96"><span class="toc-text">持久化</span></a></li></ol>
+      
+    </div>
+  </div>
+
+  
+<script src="/js/catalog.js"></script>
+
+
+
+
+    
+      <div class="comments-container">
+        
+
+
+
+
+
+
+
+      </div>
+    
+  </div>
+
+
+        
+<div class="footer">
+  <div class="social">
+    <ul>
+      
+        <li>
+          <a title="github" target="_blank" rel="noopener" href="https://github.com/cheny-alf">
+            <i class="iconfont icon-github"></i>
+          </a>
+        </li>
+      
+    </ul>
+  </div>
+  
+    
+    <div class="footer-more">
+      
+        <a target="_blank" rel="noopener" href="https://github.com/zchengsite/hexo-theme-oranges">Copyright © 2023 Oranges</a>
+        
+    </div>
+  
+    
+    <div class="footer-more">
+      
+        <a target="_blank" rel="noopener" href="https://github.com/zchengsite/hexo-theme-oranges">Theme by Oranges | Powered by Hexo</a>
+        
+    </div>
+  
+  
+    <div class="footer-views">
+      
+          本站总访问量<span id="busuanzi_value_site_pv"></span>次
+        
+      
+          本文总阅读量<span id="busuanzi_value_page_pv"></span>次
+        
+      
+      
+    </div>
+  
+</div>
+
+      </div>
+
+      <div class="tools-bar">
+        <div class="back-to-top tools-bar-item hidden">
+  <a href="javascript: void(0)">
+    <i class="iconfont icon-chevronup"></i>
+  </a>
+</div>
+
+
+<script src="/js/backtotop.js"></script>
+
+
+
+        
+  <div class="search-icon tools-bar-item" id="search-icon">
+    <a href="javascript: void(0)">
+      <i class="iconfont icon-search"></i>
+    </a>
+  </div>
+
+  <div class="search-overlay hidden">
+    <div class="search-content" tabindex="0">
+      <div class="search-title">
+        <span class="search-icon-input">
+          <a href="javascript: void(0)">
+            <i class="iconfont icon-search"></i>
+          </a>
+        </span>
+        
+          <input type="text" class="search-input" id="search-input" placeholder="Search...">
+        
+        <span class="search-close-icon" id="search-close-icon">
+          <a href="javascript: void(0)">
+            <i class="iconfont icon-close"></i>
+          </a>
+        </span>
+      </div>
+      <div class="search-result" id="search-result"></div>
+    </div>
+  </div>
+
+  <script type="text/javascript">
+    var inputArea = document.querySelector("#search-input")
+    var searchOverlayArea = document.querySelector(".search-overlay")
+
+    inputArea.onclick = function() {
+      getSearchFile()
+      this.onclick = null
+    }
+
+    inputArea.onkeydown = function() {
+      if(event.keyCode == 13)
+        return false
+    }
+
+    function openOrHideSearchContent() {
+      let isHidden = searchOverlayArea.classList.contains('hidden')
+      if (isHidden) {
+        searchOverlayArea.classList.remove('hidden')
+        document.body.classList.add('hidden')
+        // inputArea.focus()
+      } else {
+        searchOverlayArea.classList.add('hidden')
+        document.body.classList.remove('hidden')
+      }
+    }
+
+    function blurSearchContent(e) {
+      if (e.target === searchOverlayArea) {
+        openOrHideSearchContent()
+      }
+    }
+
+    document.querySelector("#search-icon").addEventListener("click", openOrHideSearchContent, false)
+    document.querySelector("#search-close-icon").addEventListener("click", openOrHideSearchContent, false)
+    searchOverlayArea.addEventListener("click", blurSearchContent, false)
+
+    var searchFunc = function (path, search_id, content_id) {
+      'use strict';
+      var $input = document.getElementById(search_id);
+      var $resultContent = document.getElementById(content_id);
+      $resultContent.innerHTML = "<ul><span class='local-search-empty'>First search, index file loading, please wait...<span></ul>";
+      $.ajax({
+        // 0x01. load xml file
+        url: path,
+        dataType: "xml",
+        success: function (xmlResponse) {
+          // 0x02. parse xml file
+          var datas = $("entry", xmlResponse).map(function () {
+            return {
+              title: $("title", this).text(),
+              content: $("content", this).text(),
+              url: $("url", this).text()
+            };
+          }).get();
+          $resultContent.innerHTML = "";
+
+          $input.addEventListener('input', function () {
+            // 0x03. parse query to keywords list
+            var str = '<ul class=\"search-result-list\">';
+            var keywords = this.value.trim().toLowerCase().split(/[\s\-]+/);
+            $resultContent.innerHTML = "";
+            if (this.value.trim().length <= 0) {
+              return;
+            }
+            // 0x04. perform local searching
+            datas.forEach(function (data) {
+              var isMatch = true;
+              var content_index = [];
+              if (!data.title || data.title.trim() === '') {
+                data.title = "Untitled";
+              }
+              var orig_data_title = data.title.trim();
+              var data_title = orig_data_title.toLowerCase();
+              var orig_data_content = data.content.trim().replace(/<[^>]+>/g, "");
+              var data_content = orig_data_content.toLowerCase();
+              var data_url = data.url;
+              var index_title = -1;
+              var index_content = -1;
+              var first_occur = -1;
+              // only match artiles with not empty contents
+              if (data_content !== '') {
+                keywords.forEach(function (keyword, i) {
+                  index_title = data_title.indexOf(keyword);
+                  index_content = data_content.indexOf(keyword);
+
+                  if (index_title < 0 && index_content < 0) {
+                    isMatch = false;
+                  } else {
+                    if (index_content < 0) {
+                      index_content = 0;
+                    }
+                    if (i == 0) {
+                      first_occur = index_content;
+                    }
+                    // content_index.push({index_content:index_content, keyword_len:keyword_len});
+                  }
+                });
+              } else {
+                isMatch = false;
+              }
+              // 0x05. show search results
+              if (isMatch) {
+                str += "<li><a href='" + data_url + "' class='search-result-title'>" + orig_data_title + "</a>";
+                var content = orig_data_content;
+                if (first_occur >= 0) {
+                  // cut out 100 characters
+                  var start = first_occur - 20;
+                  var end = first_occur + 80;
+
+                  if (start < 0) {
+                    start = 0;
+                  }
+
+                  if (start == 0) {
+                    end = 100;
+                  }
+
+                  if (end > content.length) {
+                    end = content.length;
+                  }
+
+                  var match_content = content.substr(start, end);
+
+                  // highlight all keywords
+                  keywords.forEach(function (keyword) {
+                    var regS = new RegExp(keyword, "gi");
+                    match_content = match_content.replace(regS, "<span class=\"search-keyword\">" + keyword + "</span>");
+                  });
+
+                  str += "<p class=\"search-result-abstract\">" + match_content + "...</p>"
+                }
+                str += "</li>";
+              }
+            });
+            str += "</ul>";
+            if (str.indexOf('<li>') === -1) {
+              return $resultContent.innerHTML = "<ul><span class='local-search-empty'>No result<span></ul>";
+            }
+            $resultContent.innerHTML = str;
+          });
+        },
+        error: function(xhr, status, error) {
+          $resultContent.innerHTML = ""
+          if (xhr.status === 404) {
+            $resultContent.innerHTML = "<ul><span class='local-search-empty'>The search.xml file was not found, please refer to：<a href='https://github.com/zchengsite/hexo-theme-oranges#configuration' target='_black'>configuration</a><span></ul>";
+          } else {
+            $resultContent.innerHTML = "<ul><span class='local-search-empty'>The request failed, Try to refresh the page or try again later.<span></ul>";
+          }
+        }
+      });
+      $(document).on('click', '#search-close-icon', function() {
+        $('#search-input').val('');
+        $('#search-result').html('');
+      });
+    }
+
+    var getSearchFile = function() {
+        var path = "/search.xml";
+        searchFunc(path, 'search-input', 'search-result');
+    }
+  </script>
+
+
+
+
+        
+  <div class="tools-bar-item theme-icon" id="switch-color-scheme">
+    <a href="javascript: void(0)">
+      <i id="theme-icon" class="iconfont icon-moon"></i>
+    </a>
+  </div>
+
+  
+<script src="/js/colorscheme.js"></script>
+
+
+
+
+
+        
+  
+    <div class="share-icon tools-bar-item">
+      <a href="javascript: void(0)" id="share-icon">
+        <i class="iconfont iconshare"></i>
+      </a>
+      <div class="share-content hidden">
+        
+          <a class="share-item" href="https://twitter.com/intent/tweet?text=' + redis-%E9%9D%A2%E8%AF%95-%E6%8C%81%E4%B9%85%E5%8C%96%E3%80%81%E6%B7%98%E6%B1%B0%E7%AD%96%E7%95%A5%E7%AD%89 + '&url=' + https%3A%2F%2Fcheny-alf.github.io%2F2023%2F03%2F20%2Fredis-cache%2F + '" target="_blank" title="Twitter">
+            <i class="iconfont icon-twitter"></i>
+          </a>
+        
+        
+          <a class="share-item" href="https://www.facebook.com/sharer.php?u=https://cheny-alf.github.io/2023/03/20/redis-cache/" target="_blank" title="Facebook">
+            <i class="iconfont icon-facebooksquare"></i>
+          </a>
+        
+      </div>
+    </div>
+  
+  
+<script src="/js/shares.js"></script>
+
+
+
+      </div>
+    </div>
+  </body>
+</html>
