@@ -157,7 +157,7 @@
       <div class="post-attach">
         <span class="post-pubtime">
           <i class="iconfont icon-updatetime mr-10" title="Update time"></i>
-          2023-08-13 13:57:17
+          2023-08-22 21:01:11
         </span>
         
               <span class="post-tags">
@@ -216,6 +216,7 @@
 <li>golang的mutex和channel谁的性能更高<br>性能的话 肯定是mutex的更高些的 因为Channel 会使得当前的 Goroutine 让出 cpu 给另一个 Goroutine 获得执行机会，这个上下文的切换周期不低，至少远高于 Mutex 检查竞争状态的成本(后者通常只是一个原子操作)</li>
 <li>make和new的区别</li>
 <li>map如何有序<br>定义一个结构体，key value的结构体 然后可以通过sort包 去实现sort接口，然后就可以做到这个效果了</li>
+<li>struct是否可比较<br>看情况！看struct的结构体中是否包含不可比较的成员变量的时候则不可比较，如果不包含不可比较的成员变量则可以比较。<br>go中 可比较的有：int，float，string，bool，Complex(复数型)，Pointer，Channel，Interface，Array<br>不可比较：Slice，Map，Function</li>
 </ol>
 <h2 id="内存管理"><a href="#内存管理" class="headerlink" title="内存管理"></a>内存管理</h2><h2 id="并发控制"><a href="#并发控制" class="headerlink" title="并发控制"></a>并发控制</h2><p>并发</p>
 <h2 id="error处理"><a href="#error处理" class="headerlink" title="error处理"></a>error处理</h2>
@@ -228,7 +229,7 @@
           <div class="post-attach">
             <span class="post-pubtime">
               <i class="iconfont icon-updatetime mr-10" title="Update time"></i>
-              2023-08-13 13:57:17
+              2023-08-22 21:01:11
             </span>
             
                   <span class="post-tags">
