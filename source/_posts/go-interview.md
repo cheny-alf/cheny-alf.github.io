@@ -136,6 +136,10 @@ struct 或底层是 struct 的类型并发赋值大部分情况并发不安全�
 8) make和new的区别
 9) map如何有序
 定义一个结构体，key value的结构体 然后可以通过sort包 去实现sort接口，然后就可以做到这个效果了
+10) struct是否可比较
+看情况！看struct的结构体中是否包含不可比较的成员变量的时候则不可比较，如果不包含不可比较的成员变量则可以比较。
+go中 可比较的有：int，float，string，bool，Complex(复数型)，Pointer，Channel，Interface，Array
+不可比较：Slice，Map，Function
 
 ## 内存管理
 
