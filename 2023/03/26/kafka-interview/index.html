@@ -11,7 +11,7 @@
   
   <title>
     
-      Archives 
+      kafka-interview 
       
       
       |
@@ -108,131 +108,183 @@
 
 
       <div class="flex-container">
-        <!-- 归档页，展示本站所有文章，按照年份降序归类，url形式：https://yoursite/archives/ -->
+        <!-- 文章详情页，展示文章具体内容，url形式：https://yoursite/文章标题/ -->
+<!-- 同时为「标签tag」，「朋友friend」，「分类categories」，「关于about」页面的承载页面，具体展示取决于page.type -->
 
-<!-- last: 按年份把文章分组，当前遍历到的年份 -->
-<!-- now: 当前遍历到的文章的发布年份 -->
 
-<div class="container archives">
-  <div class="post-list">
-    
-        <!-- 后续文章的发布年份呈现 -->
-        <div class="content-title">
-          <h2>
-            <span>2023</span>
-          </h2>
+  <!-- LaTex Display -->
+
+  
+    <script async type="text/javascript" src="/plugins/mathjax/tex-chtml.js"></script>
+  
+  <script>
+    MathJax = {
+      tex: {
+        inlineMath: [['$', '$'], ['\\(', '\\)']]
+      }
+    }
+  </script>
+
+
+
+
+
+  <!-- clipboard -->
+
+  
+    <script async type="text/javascript" src="/plugins/clipboard.min.js"></script>
+  
+  
+<script src="/js/codeCopy.js"></script>
+
+
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  <!-- 文章内容页 url形式：https://yoursite/文章标题/ -->
+  <div class="container post-details" id="post-details">
+    <div class="post-content">
+      <div class="post-title">kafka-interview</div>
+      <div class="post-attach">
+        <span class="post-pubtime">
+          <i class="iconfont icon-updatetime mr-10" title="Update time"></i>
+          2023-08-26 14:50:44
+        </span>
+        
+              <span class="post-tags">
+                <i class="iconfont icon-tags mr-10" title="Tags"></i>
+                
+                <span class="span--tag mr-8">
+                  <a href="/tags/%E9%9D%A2%E8%AF%95/" title="面试">
+                    #面试
+                  </a>
+                </span>
+                
+                <span class="span--tag mr-8">
+                  <a href="/tags/Kafka/" title="Kafka">
+                    #Kafka
+                  </a>
+                </span>
+                
+              </span>
+          
+      </div>
+      <div class="markdown-body">
+        <p>&emsp;&emsp;&emsp;这是一篇关于Kafka面试题的文章，主要是记录本人在面试过程中常见的一些题目以及自己认为可能会考察的面试题。当然里面的内容也是用我自己的话术来总结的，可能存在不严谨的地方，还望指出！！！</p>
+<h2 id="Kafka"><a href="#Kafka" class="headerlink" title="Kafka"></a>Kafka</h2><p>构成：</p>
+<ul>
+<li>生产者：向broker发送消息的客户端。</li>
+<li>消费者：从broker获取消息的客户端</li>
+<li>消费者组：由多个消费者组成，消费者组内每个消费者负责不同分区的数据，一个分区只能由一个组内消费者消费，未声明消费者组的消费者所有的消费者都属于一个组。</li>
+<li>Borker：一台kafka服务器就是一个broker，一个集群由多个broker组成，一个broker可以容纳多个topic。</li>
+<li>Topic：可以理解为一个队列，生产者和消费者面向的都是一个topic。</li>
+<li>Partation分区：一个topic可以分为多个partition，每个partition是一个有序队列。</li>
+<li>Replica副本，一个topic的每个分区都有若干个副本（1leader和多个follower）</li>
+<li>Leader：生产者发送数据以及消费者消费数据都是leader。</li>
+<li>follower：主要负责实时同步数据，以备不时之需。</li>
+</ul>
+<p><strong>为什么说kafka快</strong><br>采用分区来提高并行度<br>高效的文件数据结构，采用稀疏索引，在读取数据的时候可以快速定位。<br>顺序读写磁盘</p>
+<p><strong>分区的好处：</strong>1.可以合理的存储，实现负载均衡。2.可以提高并行度</p>
+<p><strong>副本的作用</strong> 提高数据的可靠性，主要也是备份的作用。</p>
+<p><strong>ACK的设置与作用</strong><br>0：表示不需要收到leader的ack的应答就发送下一个(高吞吐，低一致性)<br>1：表示只要收到leader应答就发下一个（默认）<br>-1：表示要收到leader和isr的应答才发送下一个</p>
+<p><strong>数据重复的情况：</strong> 当ack应答设置为-1时，生产者发来消息，leader和isr队列所有节点都同步完数据之后，leader在做应答的时候挂了，此时需要重新选leader，选完之后生产者又发送了一次这个消息，就会发生重复。</p>
+<p><em>解决：</em> 我们可以通过kafka的幂等性来解决这个问题，kafka通过三个id保证消息的不重复，分别是生产者ID，还有一个递增的序列号。保证这两个个不同时相同即可判断消息是否重复。<br>ProducerID：在每个新的Producer初始化时，会被分配一个唯一的ProducerID，这个ProducerID对客户端使用者是不可见的。<br>SequenceNumber：对于每个ProducerID，Producer发送数据的每个Topic和Partition都对应一个从0开始单调递增的SequenceNumber值。<br>参考地址：<a target="_blank" rel="noopener" href="https://juejin.cn/post/7172897190627508237">https://juejin.cn/post/7172897190627508237</a></p>
+<p><strong>数据有序是如何保证的</strong><br>kafka是保证单分区内数据是有序的，全局中是没办法保证有序的，然后单分区有序是通过消息的seqNumber来实现的，如果需要做到全局有序的话，那就是设置一个topic对应一个分区就好，然后消费者也可以设置成单线程的，这样的话就可以避免消费端乱序了。</p>
+<p><strong>kafka的选举机制</strong><br>满足在ISR中存活，然后按照副本集合的排列顺序，依次选举。<br>ISR：保持和leader同步的follower集合，（in sync replica）<br>OSR：落后于leader的副本集合 （out sync replica）</p>
+<p><strong>leader故障后处理细节</strong><br>当leader阶段发生故障之后，从ISR中重新选取一个leader之后，为了保证多个副本之间的一致，会把所有follower的log文件中高于高水位线的部分都截取掉，然后从新的leader中再去同步。<br>高水位线：hw（high water）是所有副本中最小的offset位置。</p>
+<p><strong>文件存储结构</strong><br>kafka发送数据之后，kafka是如何进行存储的？<br>kafka中的topic是逻辑上的概念，而partation是物理上的概念，实际上的数据存储是每个partition对应1个log文件夹，然后这个log文件夹存储的就是生产者发送的数据，数据会以追加的形式不断添加，同时，为了防止log文件过大，采用分段的方式，将partition分为多个segment段，每个segment对应有log，index，timeindex文件，这样可以通过小文件快速的定期删除或者删除已经消费完的数据。<br><strong>如何通过offset查找数据：</strong><br>首先，index和log文件的文件名是以当前segment的第一条消息的offset命名的，然后查找的时候就可以通过二分查找的方式来找到当前index文件和log文件。<br>然后，通过index文件找到对应的数据在log文件中的大致的位置，向下遍历直到找到对应的记录<br><strong>消费者与分区的分配方式：</strong><br>range：就是均匀分配，每个消费者去消费几个分区<br>roundRobin：轮询分配，依次分配<br>sticky：粘性分区，</p>
+<p><strong>offset的作用</strong><br>用于标示当前分区中的偏移量，消费到哪里了。然后维护offset有两种方式：1.自动提交 2.手动提交</p>
+<p><strong>漏消费的情况</strong><br>先提交offset，后消费可能发生漏消费<br><strong>重复消费</strong><br>已经消费了，但是offset没有提交<br><strong>解决办法</strong> 我们将消费消息和提交offset的过程做原子绑定。保证全部执行或者全部不执行。</p>
+<p><strong>消息堆积</strong><br>1。说明消费能力不行：可以增加消费者的数量，同时我们也可以增加topic的分区的数量。让消费者数和分区数一致<br>2。我们可能每批次拉取的数据少，然后导致拉取数据的速度小于生产数据的速度，导致积压，我们可以提高每批次拉取数据的量。</p>
+
+      </div>
+      
+        <div class="prev-or-next">
+          <div class="post-foot-next">
+            
+              <a href="/2023/03/20/redis/" target="_self">
+                <i class="iconfont icon-chevronleft"></i>
+                <span>Prev</span>
+              </a>
+            
+          </div>
+          <div class="post-attach">
+            <span class="post-pubtime">
+              <i class="iconfont icon-updatetime mr-10" title="Update time"></i>
+              2023-08-26 14:50:44
+            </span>
+            
+                  <span class="post-tags">
+                    <i class="iconfont icon-tags mr-10" title="Tags"></i>
+                    
+                    <span class="span--tag mr-8">
+                      <a href="/tags/%E9%9D%A2%E8%AF%95/" title="面试">
+                        #面试
+                      </a>
+                    </span>
+                    
+                    <span class="span--tag mr-8">
+                      <a href="/tags/Kafka/" title="Kafka">
+                        #Kafka
+                      </a>
+                    </span>
+                    
+                  </span>
+              
+          </div>
+          <div class="post-foot-prev">
+            
+              <a href="/2023/04/10/delay-queue/" target="_self">
+                <span>Next</span>
+                <i class="iconfont icon-chevronright"></i>
+              </a>
+            
+          </div>
         </div>
       
-      <div class="post-item" title="每日阅读--mutex的发展">
-        <div class="time-m-d">08-16</div>
-        <div class="title">
-          <a href="/2023/08/16/dailyread1/">
-            <span>每日阅读--mutex的发展</span>
-          </a>
-        </div>
-      </div>
+    </div>
     
-      <div class="post-item" title="Hello World">
-        <div class="time-m-d">08-09</div>
-        <div class="title">
-          <a href="/2023/08/09/hello-world/">
-            <span>Hello World</span>
-          </a>
-        </div>
-      </div>
+  <div id="btn-catalog" class="btn-catalog">
+    <i class="iconfont icon-catalog"></i>
+  </div>
+  <div class="post-catalog hidden" id="catalog">
+    <div class="title">Contents</div>
+    <div class="catalog-content">
+      
+        <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#Kafka"><span class="toc-text">Kafka</span></a></li></ol>
+      
+    </div>
+  </div>
+
+  
+<script src="/js/catalog.js"></script>
+
+
+
+
     
-      <div class="post-item" title="常见的限流方案与实现">
-        <div class="time-m-d">07-11</div>
-        <div class="title">
-          <a href="/2023/07/11/limiter/">
-            <span>常见的限流方案与实现</span>
-          </a>
-        </div>
-      </div>
-    
-      <div class="post-item" title="基于 Redis 实现的支持延时/定时投递的消息队列">
-        <div class="time-m-d">04-10</div>
-        <div class="title">
-          <a href="/2023/04/10/delay-queue/">
-            <span>基于 Redis 实现的支持延时/定时投递的消息队列</span>
-          </a>
-        </div>
-      </div>
-    
-      <div class="post-item" title="kafka-interview">
-        <div class="time-m-d">03-26</div>
-        <div class="title">
-          <a href="/2023/03/26/kafka-interview/">
-            <span>kafka-interview</span>
-          </a>
-        </div>
-      </div>
-    
-      <div class="post-item" title="redis-面试-基本数据结构">
-        <div class="time-m-d">03-20</div>
-        <div class="title">
-          <a href="/2023/03/20/redis/">
-            <span>redis-面试-基本数据结构</span>
-          </a>
-        </div>
-      </div>
-    
-      <div class="post-item" title="redis-面试-持久化、淘汰策略等">
-        <div class="time-m-d">03-20</div>
-        <div class="title">
-          <a href="/2023/03/20/redis-cache/">
-            <span>redis-面试-持久化、淘汰策略等</span>
-          </a>
-        </div>
-      </div>
-    
-      <div class="post-item" title="go-面试-异常处理">
-        <div class="time-m-d">03-15</div>
-        <div class="title">
-          <a href="/2023/03/15/handelerr/">
-            <span>go-面试-异常处理</span>
-          </a>
-        </div>
-      </div>
-    
-      <div class="post-item" title="go-面试-并发控制">
-        <div class="time-m-d">03-14</div>
-        <div class="title">
-          <a href="/2023/03/14/concurrent/">
-            <span>go-面试-并发控制</span>
-          </a>
-        </div>
-      </div>
-    
-      <div class="post-item" title="go-面试-内存管理">
-        <div class="time-m-d">03-13</div>
-        <div class="title">
-          <a href="/2023/03/13/memorymange/">
-            <span>go-面试-内存管理</span>
-          </a>
-        </div>
-      </div>
-    
-      <div class="post-item" title="go-面试-协程">
-        <div class="time-m-d">03-11</div>
-        <div class="title">
-          <a href="/2023/03/11/goroutine/">
-            <span>go-面试-协程</span>
-          </a>
-        </div>
-      </div>
-    
-      <div class="post-item" title="go-面试-数据结构">
-        <div class="time-m-d">03-10</div>
-        <div class="title">
-          <a href="/2023/03/10/go-interview/">
-            <span>go-面试-数据结构</span>
-          </a>
-        </div>
+      <div class="comments-container">
+        
+
+
+
+
+
+
+
       </div>
     
   </div>
-</div>
+
 
         
 <div class="footer">
@@ -498,6 +550,24 @@
 
 
         
+  
+    <div class="share-icon tools-bar-item">
+      <a href="javascript: void(0)" id="share-icon">
+        <i class="iconfont iconshare"></i>
+      </a>
+      <div class="share-content hidden">
+        
+          <a class="share-item" href="https://twitter.com/intent/tweet?text=' + kafka-interview + '&url=' + https%3A%2F%2Fcheny-alf.github.io%2F2023%2F03%2F26%2Fkafka-interview%2F + '" target="_blank" title="Twitter">
+            <i class="iconfont icon-twitter"></i>
+          </a>
+        
+        
+          <a class="share-item" href="https://www.facebook.com/sharer.php?u=https://cheny-alf.github.io/2023/03/26/kafka-interview/" target="_blank" title="Facebook">
+            <i class="iconfont icon-facebooksquare"></i>
+          </a>
+        
+      </div>
+    </div>
   
   
 <script src="/js/shares.js"></script>
