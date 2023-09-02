@@ -11,6 +11,11 @@
   
   <title>
     
+      mysql主从复制 
+      
+      
+      |
+    
      陈sir爱狂扁
   </title>
 
@@ -103,149 +108,153 @@
 
 
       <div class="flex-container">
-        <div class="container index">
-  <div class="post-list">
-    <!-- 遍历渲染文章 -->
-    
-      <div class="post-item" title="mysql主从复制">
-        <div class="time-m-d">2023-09-02</div>
-        <div class="title">
-          <a href="/2023/09/02/master-slave/">
-            
-              
-                <span>mysql主从复制</span>
-              
-            
-          </a>
-        </div>
+        <!-- 文章详情页，展示文章具体内容，url形式：https://yoursite/文章标题/ -->
+<!-- 同时为「标签tag」，「朋友friend」，「分类categories」，「关于about」页面的承载页面，具体展示取决于page.type -->
+
+
+  <!-- LaTex Display -->
+
+  
+    <script async type="text/javascript" src="/plugins/mathjax/tex-chtml.js"></script>
+  
+  <script>
+    MathJax = {
+      tex: {
+        inlineMath: [['$', '$'], ['\\(', '\\)']]
+      }
+    }
+  </script>
+
+
+
+
+
+  <!-- clipboard -->
+
+  
+    <script async type="text/javascript" src="/plugins/clipboard.min.js"></script>
+  
+  
+<script src="/js/codeCopy.js"></script>
+
+
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  <!-- 文章内容页 url形式：https://yoursite/文章标题/ -->
+  <div class="container post-details" id="post-details">
+    <div class="post-content">
+      <div class="post-title">mysql主从复制</div>
+      <div class="post-attach">
+        <span class="post-pubtime">
+          <i class="iconfont icon-updatetime mr-10" title="Update time"></i>
+          2023-09-02 14:40:48
+        </span>
+        
+              <span class="post-tags">
+                <i class="iconfont icon-tags mr-10" title="Tags"></i>
+                
+                <span class="span--tag mr-8">
+                  <a href="/tags/mysql/" title="mysql">
+                    #mysql
+                  </a>
+                </span>
+                
+              </span>
+          
       </div>
-    
-      <div class="post-item" title="AK/SK简述">
-        <div class="time-m-d">2023-09-01</div>
-        <div class="title">
-          <a href="/2023/09/01/aksk/">
-            
-              
-                <span>AK/SK简述</span>
-              
-            
-          </a>
-        </div>
+      <div class="markdown-body">
+        <p><strong>瞎扯时间到！！！</strong></p>
+<h3 id="什么是主从复制？"><a href="#什么是主从复制？" class="headerlink" title="什么是主从复制？"></a>什么是主从复制？</h3><p>主从复制是指将主库到表结构、表数据也就是DDL和DML操作通过<strong>binlog</strong>日志传输到从库中去，然后在从库中对这些日志从新执行(重做),从而使的从库和主库数据保持同步。</p>
+<p>mysql支持一台主库向多台从库进行复制，从库也可以作为主库像其他的从库同步数据，形成链式复制。</p>
+<h3 id="为什么需要主从复制"><a href="#为什么需要主从复制" class="headerlink" title="为什么需要主从复制"></a>为什么需要主从复制</h3><ol>
+<li>主库出现问题，可以快速切换到从库，提供服务</li>
+<li>实现读写分离，降低主库的访问压力。写操作全都在主库上执行，读操作都在从库上执行</li>
+<li>可以在从库进行备份操作，以避免备份期间影响主库服务（备份期间会加一个全局锁，整个数据库就会是只读的，无法进行增删改操作。会把整个库锁住）</li>
+</ol>
+<h3 id="原理"><a href="#原理" class="headerlink" title="原理"></a>原理</h3><ol>
+<li>master主库在事务提交的时候，会把数据变更记录在二进制日志文件binlog中</li>
+<li>从库有个IOThread线程读取主库的二进制日志文件binlog，写入到从库的中继日志RelayLog里。</li>
+<li>slave重做中继日志RelayLog中的事件，将改变反映在自己的数据中</li>
+</ol>
+
       </div>
-    
-      <div class="post-item" title="golang 替换string中的emoji、英文符号等">
-        <div class="time-m-d">2023-08-31</div>
-        <div class="title">
-          <a href="/2023/08/31/transfor/">
+      
+        <div class="prev-or-next">
+          <div class="post-foot-next">
             
-              
-                <span>golang 替换string中的emoji、英文符号等</span>
-              
+              <a href="/2023/09/01/aksk/" target="_self">
+                <i class="iconfont icon-chevronleft"></i>
+                <span>Prev</span>
+              </a>
             
-          </a>
+          </div>
+          <div class="post-attach">
+            <span class="post-pubtime">
+              <i class="iconfont icon-updatetime mr-10" title="Update time"></i>
+              2023-09-02 14:40:48
+            </span>
+            
+                  <span class="post-tags">
+                    <i class="iconfont icon-tags mr-10" title="Tags"></i>
+                    
+                    <span class="span--tag mr-8">
+                      <a href="/tags/mysql/" title="mysql">
+                        #mysql
+                      </a>
+                    </span>
+                    
+                  </span>
+              
+          </div>
+          <div class="post-foot-prev">
+            
+          </div>
         </div>
-      </div>
+      
+    </div>
     
-      <div class="post-item" title="每日阅读--mutex的发展">
-        <div class="time-m-d">2023-08-16</div>
-        <div class="title">
-          <a href="/2023/08/16/dailyread1/">
-            
-              
-                <span>每日阅读--mutex的发展</span>
-              
-            
-          </a>
-        </div>
-      </div>
+  <div id="btn-catalog" class="btn-catalog">
+    <i class="iconfont icon-catalog"></i>
+  </div>
+  <div class="post-catalog hidden" id="catalog">
+    <div class="title">Contents</div>
+    <div class="catalog-content">
+      
+        <ol class="toc"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E4%BB%80%E4%B9%88%E6%98%AF%E4%B8%BB%E4%BB%8E%E5%A4%8D%E5%88%B6%EF%BC%9F"><span class="toc-text">什么是主从复制？</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E4%B8%BA%E4%BB%80%E4%B9%88%E9%9C%80%E8%A6%81%E4%B8%BB%E4%BB%8E%E5%A4%8D%E5%88%B6"><span class="toc-text">为什么需要主从复制</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%8E%9F%E7%90%86"><span class="toc-text">原理</span></a></li></ol>
+      
+    </div>
+  </div>
+
+  
+<script src="/js/catalog.js"></script>
+
+
+
+
     
-      <div class="post-item" title="Hello World">
-        <div class="time-m-d">2023-08-09</div>
-        <div class="title">
-          <a href="/2023/08/09/hello-world/">
-            
-              
-                <span>Hello World</span>
-              
-            
-          </a>
-        </div>
-      </div>
-    
-      <div class="post-item" title="常见的限流方案与实现">
-        <div class="time-m-d">2023-07-11</div>
-        <div class="title">
-          <a href="/2023/07/11/limiter/">
-            
-              
-                <span>常见的限流方案与实现</span>
-              
-            
-          </a>
-        </div>
-      </div>
-    
-      <div class="post-item" title="基于 Redis 实现的支持延时/定时投递的消息队列">
-        <div class="time-m-d">2023-04-10</div>
-        <div class="title">
-          <a href="/2023/04/10/delay-queue/">
-            
-              
-                <span>基于 Redis 实现的支持延时/定时投递的消息队列</span>
-              
-            
-          </a>
-        </div>
-      </div>
-    
-      <div class="post-item" title="kafka-interview">
-        <div class="time-m-d">2023-03-26</div>
-        <div class="title">
-          <a href="/2023/03/26/kafka-interview/">
-            
-              
-                <span>kafka-interview</span>
-              
-            
-          </a>
-        </div>
-      </div>
-    
-      <div class="post-item" title="redis-面试-基本数据结构">
-        <div class="time-m-d">2023-03-20</div>
-        <div class="title">
-          <a href="/2023/03/20/redis/">
-            
-              
-                <span>redis-面试-基本数据结构</span>
-              
-            
-          </a>
-        </div>
-      </div>
-    
-      <div class="post-item" title="redis-面试-持久化、淘汰策略等">
-        <div class="time-m-d">2023-03-20</div>
-        <div class="title">
-          <a href="/2023/03/20/redis-cache/">
-            
-              
-                <span>redis-面试-持久化、淘汰策略等</span>
-              
-            
-          </a>
-        </div>
+      <div class="comments-container">
+        
+
+
+
+
+
+
+
       </div>
     
   </div>
-  <nav class="post-navigation">
-    
-    <span class="page-num">1 / 2</span>
-    
-      <a href="/page/2/"><i class="iconfont icon-angleright"></i></a>
-    
-  </nav>
-</div>
+
 
         
 <div class="footer">
@@ -511,6 +520,24 @@
 
 
         
+  
+    <div class="share-icon tools-bar-item">
+      <a href="javascript: void(0)" id="share-icon">
+        <i class="iconfont iconshare"></i>
+      </a>
+      <div class="share-content hidden">
+        
+          <a class="share-item" href="https://twitter.com/intent/tweet?text=' + mysql%E4%B8%BB%E4%BB%8E%E5%A4%8D%E5%88%B6 + '&url=' + https%3A%2F%2Fcheny-alf.github.io%2F2023%2F09%2F02%2Fmaster-slave%2F + '" target="_blank" title="Twitter">
+            <i class="iconfont icon-twitter"></i>
+          </a>
+        
+        
+          <a class="share-item" href="https://www.facebook.com/sharer.php?u=https://cheny-alf.github.io/2023/09/02/master-slave/" target="_blank" title="Facebook">
+            <i class="iconfont icon-facebooksquare"></i>
+          </a>
+        
+      </div>
+    </div>
   
   
 <script src="/js/shares.js"></script>
