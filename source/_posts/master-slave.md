@@ -21,3 +21,4 @@ mysql支持一台主库向多台从库进行复制，从库也可以作为主库
 1. master主库在事务提交的时候，会把数据变更记录在二进制日志文件binlog中
 2. 从库有个IOThread线程读取主库的二进制日志文件binlog，写入到从库的中继日志RelayLog里。
 3. slave重做中继日志RelayLog中的事件，将改变反映在自己的数据中
+![img.png](../images/master-slave.png)
