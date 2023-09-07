@@ -11,6 +11,11 @@
   
   <title>
     
+      分库分表--概览 
+      
+      
+      |
+    
      陈sir爱狂扁
   </title>
 
@@ -103,149 +108,154 @@
 
 
       <div class="flex-container">
-        <div class="container index">
-  <div class="post-list">
-    <!-- 遍历渲染文章 -->
-    
-      <div class="post-item" title="分库分表--概览">
-        <div class="time-m-d">2023-09-07</div>
-        <div class="title">
-          <a href="/2023/09/07/sub-table/">
-            
-              
-                <span>分库分表--概览</span>
-              
-            
-          </a>
-        </div>
+        <!-- 文章详情页，展示文章具体内容，url形式：https://yoursite/文章标题/ -->
+<!-- 同时为「标签tag」，「朋友friend」，「分类categories」，「关于about」页面的承载页面，具体展示取决于page.type -->
+
+
+  <!-- LaTex Display -->
+
+  
+    <script async type="text/javascript" src="/plugins/mathjax/tex-chtml.js"></script>
+  
+  <script>
+    MathJax = {
+      tex: {
+        inlineMath: [['$', '$'], ['\\(', '\\)']]
+      }
+    }
+  </script>
+
+
+
+
+
+  <!-- clipboard -->
+
+  
+    <script async type="text/javascript" src="/plugins/clipboard.min.js"></script>
+  
+  
+<script src="/js/codeCopy.js"></script>
+
+
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  <!-- 文章内容页 url形式：https://yoursite/文章标题/ -->
+  <div class="container post-details" id="post-details">
+    <div class="post-content">
+      <div class="post-title">分库分表--概览</div>
+      <div class="post-attach">
+        <span class="post-pubtime">
+          <i class="iconfont icon-updatetime mr-10" title="Update time"></i>
+          2023-09-07 20:08:24
+        </span>
+        
+              <span class="post-tags">
+                <i class="iconfont icon-tags mr-10" title="Tags"></i>
+                
+                <span class="span--tag mr-8">
+                  <a href="/tags/mysql/" title="mysql">
+                    #mysql
+                  </a>
+                </span>
+                
+              </span>
+          
       </div>
-    
-      <div class="post-item" title="mysql-read-write">
-        <div class="time-m-d">2023-09-02</div>
-        <div class="title">
-          <a href="/2023/09/02/mysql-read-write/">
-            
-              
-                <span>mysql-read-write</span>
-              
-            
-          </a>
-        </div>
+      <div class="markdown-body">
+        <p>今天，我们来瞎掰扯掰扯Mysql分库分表相关内容～</p>
+<h3 id="什么是分库分表"><a href="#什么是分库分表" class="headerlink" title="什么是分库分表"></a>什么是分库分表</h3><h4 id="分表"><a href="#分表" class="headerlink" title="分表"></a>分表</h4><p>比如我们的单表数据量已经达到几千万了，单表数据量这么大，会极大的影响sql的执行性能。单表数据量在几百万的时候，性能就会相对差一点，就应该考虑分表了。</p>
+<p>分表是什么意思呢？就是将一个表的数据放到多个表中，然后查询的时候就查询一个表。比如按照UserID来进行分表，将一个用户的数据存放在一个表中，然后操作这个用户的时候就操作一个表就好了。这样可以控制每个表的数据量在200w左右</p>
+<h4 id="分库"><a href="#分库" class="headerlink" title="分库"></a>分库</h4><p>mysql单库最多支持2000的并发，当并发达到这个值的时候就必须要扩容了，而且一个健康的单库并发应该在1000左右，不要太大。可以将一个库的数据拆分到多个库中，访问的时候就访问一个库好了。</p>
+<h3 id="如何去对数据库做拆分？水平拆分还是垂直拆分"><a href="#如何去对数据库做拆分？水平拆分还是垂直拆分" class="headerlink" title="如何去对数据库做拆分？水平拆分还是垂直拆分"></a>如何去对数据库做拆分？水平拆分还是垂直拆分</h3><p><strong>水平拆分</strong>就是把一个表的数据给弄到多个库的多个表里去，但是每个表的表结构都是一样的，不过每个表里数据是不相同的，所有库表的数据加起来就是全部的数据。<strong>水平拆分的意义</strong>在于将数据均匀放在更多的库表，然后用更多的库表来抗并发，同时也保证每个表的数据量不会太多，影响查询效率。</p>
+<p><strong>垂直拆分</strong>就是把一个有很多字段的表给拆分成多个表，或者是多个库上去，每个表的表结构都不一样，每个库表都包含一部分的字段。一般来说，会将较少的访问频率较高的字段放到一个表里去，然后将较多的访问频率较低的字段存放到另一个表里去。</p>
+<h3 id="在项目中该如何去做拆分？"><a href="#在项目中该如何去做拆分？" class="headerlink" title="在项目中该如何去做拆分？"></a>在项目中该如何去做拆分？</h3><p>在项目中，一般来说垂直拆分，你可以在表层面来做，对一些字段特别多的表做一下拆分；水平拆分，你可以说是并发承载不了，或者是数据量太大，容量承载不了，去按照某个字段做水平拆分。<br><strong>分库分表方式</strong>：按照某个字段 hash 一下均匀分散，这个较为常用。好处在于说，可以平均分配每个库的数据量和请求压力；</p>
+<h3 id="我们如何去做迁移？如何无损的迁移？（迁移全流程）"><a href="#我们如何去做迁移？如何无损的迁移？（迁移全流程）" class="headerlink" title="我们如何去做迁移？如何无损的迁移？（迁移全流程）"></a>我们如何去做迁移？如何无损的迁移？（迁移全流程）</h3><ol>
+<li>首先，我们保持原有的单写，写到旧的数据库中，然后先通过脚本把一些静态的数据（就是哪些不需要修改的数据）进行迁移，迁移完了之后去验证数据的准确性。</li>
+<li>配置新的数据库，然后开启双写，还是旧的数据库提供读，然后再去迁移哪些动态数据，迁移完了之后验证动态数据的准确性</li>
+<li>最后我们在切换数据源，切换到新的数据库，验证是否有问题，有问题就切会旧的</li>
+<li>关闭双写 迁移完成。</li>
+</ol>
+<h3 id="分库分表之后，主键ID怎么处理？"><a href="#分库分表之后，主键ID怎么处理？" class="headerlink" title="分库分表之后，主键ID怎么处理？"></a>分库分表之后，主键ID怎么处理？</h3><p>分布式ID：<a target="_blank" rel="noopener" href="https://cloud.tencent.com/developer/article/2149830">https://cloud.tencent.com/developer/article/2149830</a></p>
+
       </div>
-    
-      <div class="post-item" title="mysql主从复制">
-        <div class="time-m-d">2023-09-02</div>
-        <div class="title">
-          <a href="/2023/09/02/master-slave/">
+      
+        <div class="prev-or-next">
+          <div class="post-foot-next">
             
-              
-                <span>mysql主从复制</span>
-              
+              <a href="/2023/09/02/mysql-read-write/" target="_self">
+                <i class="iconfont icon-chevronleft"></i>
+                <span>Prev</span>
+              </a>
             
-          </a>
+          </div>
+          <div class="post-attach">
+            <span class="post-pubtime">
+              <i class="iconfont icon-updatetime mr-10" title="Update time"></i>
+              2023-09-07 20:08:24
+            </span>
+            
+                  <span class="post-tags">
+                    <i class="iconfont icon-tags mr-10" title="Tags"></i>
+                    
+                    <span class="span--tag mr-8">
+                      <a href="/tags/mysql/" title="mysql">
+                        #mysql
+                      </a>
+                    </span>
+                    
+                  </span>
+              
+          </div>
+          <div class="post-foot-prev">
+            
+          </div>
         </div>
-      </div>
+      
+    </div>
     
-      <div class="post-item" title="AK/SK简述">
-        <div class="time-m-d">2023-09-01</div>
-        <div class="title">
-          <a href="/2023/09/01/aksk/">
-            
-              
-                <span>AK/SK简述</span>
-              
-            
-          </a>
-        </div>
-      </div>
+  <div id="btn-catalog" class="btn-catalog">
+    <i class="iconfont icon-catalog"></i>
+  </div>
+  <div class="post-catalog hidden" id="catalog">
+    <div class="title">Contents</div>
+    <div class="catalog-content">
+      
+        <ol class="toc"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E4%BB%80%E4%B9%88%E6%98%AF%E5%88%86%E5%BA%93%E5%88%86%E8%A1%A8"><span class="toc-text">什么是分库分表</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#%E5%88%86%E8%A1%A8"><span class="toc-text">分表</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E5%88%86%E5%BA%93"><span class="toc-text">分库</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%A6%82%E4%BD%95%E5%8E%BB%E5%AF%B9%E6%95%B0%E6%8D%AE%E5%BA%93%E5%81%9A%E6%8B%86%E5%88%86%EF%BC%9F%E6%B0%B4%E5%B9%B3%E6%8B%86%E5%88%86%E8%BF%98%E6%98%AF%E5%9E%82%E7%9B%B4%E6%8B%86%E5%88%86"><span class="toc-text">如何去对数据库做拆分？水平拆分还是垂直拆分</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%9C%A8%E9%A1%B9%E7%9B%AE%E4%B8%AD%E8%AF%A5%E5%A6%82%E4%BD%95%E5%8E%BB%E5%81%9A%E6%8B%86%E5%88%86%EF%BC%9F"><span class="toc-text">在项目中该如何去做拆分？</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%88%91%E4%BB%AC%E5%A6%82%E4%BD%95%E5%8E%BB%E5%81%9A%E8%BF%81%E7%A7%BB%EF%BC%9F%E5%A6%82%E4%BD%95%E6%97%A0%E6%8D%9F%E7%9A%84%E8%BF%81%E7%A7%BB%EF%BC%9F%EF%BC%88%E8%BF%81%E7%A7%BB%E5%85%A8%E6%B5%81%E7%A8%8B%EF%BC%89"><span class="toc-text">我们如何去做迁移？如何无损的迁移？（迁移全流程）</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%88%86%E5%BA%93%E5%88%86%E8%A1%A8%E4%B9%8B%E5%90%8E%EF%BC%8C%E4%B8%BB%E9%94%AEID%E6%80%8E%E4%B9%88%E5%A4%84%E7%90%86%EF%BC%9F"><span class="toc-text">分库分表之后，主键ID怎么处理？</span></a></li></ol>
+      
+    </div>
+  </div>
+
+  
+<script src="/js/catalog.js"></script>
+
+
+
+
     
-      <div class="post-item" title="golang 替换string中的emoji、英文符号等">
-        <div class="time-m-d">2023-08-31</div>
-        <div class="title">
-          <a href="/2023/08/31/transfor/">
-            
-              
-                <span>golang 替换string中的emoji、英文符号等</span>
-              
-            
-          </a>
-        </div>
-      </div>
-    
-      <div class="post-item" title="每日阅读--mutex的发展">
-        <div class="time-m-d">2023-08-16</div>
-        <div class="title">
-          <a href="/2023/08/16/dailyread1/">
-            
-              
-                <span>每日阅读--mutex的发展</span>
-              
-            
-          </a>
-        </div>
-      </div>
-    
-      <div class="post-item" title="Hello World">
-        <div class="time-m-d">2023-08-09</div>
-        <div class="title">
-          <a href="/2023/08/09/hello-world/">
-            
-              
-                <span>Hello World</span>
-              
-            
-          </a>
-        </div>
-      </div>
-    
-      <div class="post-item" title="常见的限流方案与实现">
-        <div class="time-m-d">2023-07-11</div>
-        <div class="title">
-          <a href="/2023/07/11/limiter/">
-            
-              
-                <span>常见的限流方案与实现</span>
-              
-            
-          </a>
-        </div>
-      </div>
-    
-      <div class="post-item" title="基于 Redis 实现的支持延时/定时投递的消息队列">
-        <div class="time-m-d">2023-04-10</div>
-        <div class="title">
-          <a href="/2023/04/10/delay-queue/">
-            
-              
-                <span>基于 Redis 实现的支持延时/定时投递的消息队列</span>
-              
-            
-          </a>
-        </div>
-      </div>
-    
-      <div class="post-item" title="kafka-interview">
-        <div class="time-m-d">2023-03-26</div>
-        <div class="title">
-          <a href="/2023/03/26/kafka-interview/">
-            
-              
-                <span>kafka-interview</span>
-              
-            
-          </a>
-        </div>
+      <div class="comments-container">
+        
+
+
+
+
+
+
+
       </div>
     
   </div>
-  <nav class="post-navigation">
-    
-    <span class="page-num">1 / 2</span>
-    
-      <a href="/page/2/"><i class="iconfont icon-angleright"></i></a>
-    
-  </nav>
-</div>
+
 
         
 <div class="footer">
@@ -511,6 +521,24 @@
 
 
         
+  
+    <div class="share-icon tools-bar-item">
+      <a href="javascript: void(0)" id="share-icon">
+        <i class="iconfont iconshare"></i>
+      </a>
+      <div class="share-content hidden">
+        
+          <a class="share-item" href="https://twitter.com/intent/tweet?text=' + %E5%88%86%E5%BA%93%E5%88%86%E8%A1%A8--%E6%A6%82%E8%A7%88 + '&url=' + https%3A%2F%2Fcheny-alf.github.io%2F2023%2F09%2F07%2Fsub-table%2F + '" target="_blank" title="Twitter">
+            <i class="iconfont icon-twitter"></i>
+          </a>
+        
+        
+          <a class="share-item" href="https://www.facebook.com/sharer.php?u=https://cheny-alf.github.io/2023/09/07/sub-table/" target="_blank" title="Facebook">
+            <i class="iconfont icon-facebooksquare"></i>
+          </a>
+        
+      </div>
+    </div>
   
   
 <script src="/js/shares.js"></script>
