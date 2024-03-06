@@ -8,13 +8,10 @@
   <meta name="author" content="John Doe" />
   <meta name="description" content="" />
   
+    <meta name="robots" content="noindex" />
+  
   
   <title>
-    
-      Tag 
-       : redis
-      
-      |
     
      陈sir爱狂扁
   </title>
@@ -108,27 +105,29 @@
 
 
       <div class="flex-container">
-        <!-- 标签详情页，展示某个标签下的文章列表，url形式：https://yoursite/tags/某个标签/ -->
-
-<div class="container tag-details">
-  <div class="content-title">
-    <h2>
-      <span>redis</span>
-    </h2>
-  </div>
-  
-    <div class="post-list">
-      <div class="post-item" title="常见的限流方案与实现">
-        <span class="time-m-d">2023-07-11</span>
-        <a href="/2023/07/11/limiter/">
-          <span>常见的限流方案与实现</span>
-        </a>
+        <div class="container index">
+  <div class="post-list">
+    <!-- 遍历渲染文章 -->
+    
+      <div class="post-item" title="go-面试-数据结构">
+        <div class="time-m-d">2023-03-10</div>
+        <div class="title">
+          <a href="/2023/03/10/go-interview/">
+            
+              
+                <span>go-面试-数据结构</span>
+              
+            
+          </a>
+        </div>
       </div>
-    </div>
-  
+    
+  </div>
   <nav class="post-navigation">
     
-    <span class="page-num">1 / 1</span>
+      <a href="/page/2/"><i class="iconfont icon-angleleft"></i></a>
+    
+    <span class="page-num">3 / 3</span>
     
   </nav>
 </div>
@@ -367,47 +366,6 @@
           }
         }
       });
-      $(document).on('click', '#search-close-icon', function() {
-        $('#search-input').val('');
-        $('#search-result').html('');
-      });
-    }
-
-    var getSearchFile = function() {
-        var path = "/search.xml";
-        searchFunc(path, 'search-input', 'search-result');
-    }
-  </script>
-
-
-
-
-        
-  <div class="tools-bar-item theme-icon" id="switch-color-scheme">
-    <a href="javascript: void(0)">
-      <i id="theme-icon" class="iconfont icon-moon"></i>
-    </a>
-  </div>
-
-  
-<script src="/js/colorscheme.js"></script>
-
-
-
-
-
-        
-  
-  
-<script src="/js/shares.js"></script>
-
-
-
-      </div>
-    </div>
-  </body>
-</html>
-    });
       $(document).on('click', '#search-close-icon', function() {
         $('#search-input').val('');
         $('#search-result').html('');
