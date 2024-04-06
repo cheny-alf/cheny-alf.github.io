@@ -1,35 +1,17 @@
-extends partial/layout
-
-include mixins
-
-block site_title
-    != page.title + " · " + config.title
-
-block description
-    - var desc = page.desc || strip_html(page.content).replace(/^\s*/, '').replace(/\s*$/, '').substring(0, 150);
-    meta(name="description", content=desc)
-
-block content
-  .autopagerize_page_element: .content: .post-page
-    include mixins
-    +make_post(page, true)
-    .share
-      .evernote
-        a.fa.fa-bookmark(href="",onclick="javascript:join_favorite()", ref="sidebar")
-      .weibo
-        a.fa.fa-weibo(href="javascript:void((function(s,d,e){try{}catch(e){}var f='http://service.weibo.com/share/share.php?',u=d.location.href,p=['url=',e(u),'&title=',e(d.title),'&appkey=2924220432'].join('');function a(){if(!window.open([f,p].join(''),'mb',['toolbar=0,status=0,resizable=1,width=620,height=450,left=',(s.width-620)/2,',top=',(s.height-450)/2].join('')))u.href=[f,p].join('');};if(/Firefox/.test(navigator.userAgent)){setTimeout(a,0)}else{a()}})(screen,document,encodeURIComponent));")
-      .twitter
-        - var twitter_text = encodeURI(__('Share_text') + "\n\n" + config.title+" · "+page.title+"\n"+config.url+"/"+page.path+"\n")
-        a.fa.fa-twitter(href=url_for("http://twitter.com/intent/tweet?text="+ twitter_text))
-    - var prev = page.prev ? page.prev.path : false;
-    - var next = page.next ? page.next.path : false;
-    .pagination
-      ul.clearfix
-        if prev
-          li.pre.pagbuttons
-            a.btn(role="navigation",href=url_for(prev), title=page.prev.title)!= __('prev_post')
-        if next
-          li.next.pagbuttons
-            a.btn(role="navigation",href=url_for(next), title=page.next.title)!= __('next_post')
-    if page.comments
-        include partial/comments
+<!DOCTYPE html><html lang="zh-CN" id="theme-light-mode"><head><meta charset="utf-8"><meta name="X-UA-Compatible" content="IE=edge"><meta name="author" content="Yourname"><title>分库分表--概览 · 陈sir爱狂扁</title><meta name="description" content="今天，我们来瞎掰扯掰扯Mysql分库分表相关内容～
+什么是分库分表分表比如我们的单表数据量已经达到几千万了，单表数据量这么大，会极大的影响sql的执行性能。单表数据量在几百万的时候，性能就会相对差一点，就应该考虑分表了。
+分表是什么意思呢？就是将一个表的数据放到多个表中，然后查询的时候就查询一个表。"><meta name="keywords" content="Blog,博客,Hexo"><meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0" name="viewport"><meta content="yes" name="apple-mobile-web-app-capable"><meta content="black" name="apple-mobile-web-app-status-bar-style"><meta content="telephone=no" name="format-detection"><meta name="renderer" content="webkit"><link rel="shortcut icon" type="image/x-icon" href="/images/favicon.webp"><link rel="stylesheet" href="/css/style.css"><link rel="stylesheet" href="/css/blog_basic.css"><link rel="stylesheet" href="/css/font-awesome.min.css"><link rel="stylesheet" href="/css/insight.css"><link rel="stylesheet" href="/css/search.css"><link rel="alternate" type="application/atom+xml" title="ATOM 1.0" href="/atom.xml"><script src="/js/jquery.js"></script><meta name="generator" content="Hexo 6.3.0"></head><body><div class="page-top animated fadeInDown"><div class="nav"><li> <a href="/">Home</a></li><li> <a href="/archives">Archives</a></li><li> <a href="/tags">Tags</a></li><li> <a href="/about">About</a></li><li> <a href="/links">Links</a></li></div><div class="information"><div class="nav_right_btn"><li><a class="fa fa-chevron-left" onclick="window.history.go(-1)"> </a></li><li><a class="fa fa-search" onclick="openWindow();"></a></li><li><a class="fa fa-sun-o" onclick="darkLightToggle();"></a></li></div><div class="avatar"><img src="/images/logo.webp"></div></div></div><div class="sidebar animated fadeInDown"><div class="sidebar-top"><div class="logo-title"><div class="title"><img src="/images/logo@2x.webp" style="width:220px;" alt="favicon"><h3 title=""><a href="/">陈sir爱狂扁</a></h3><div class="description"><p>A simple and beautiful blog</p></div></div><ul class="social-links"><li><a target="_blank" rel="noopener" href="https://github.com/Lhcfl"><i class="fa fa-github"></i></a></li><li><a href="mailto:yourname@example.com"><i class="fa fa-envelope"></i></a></li></ul></div></div><div class="footer"><div class="p"> <span> 全站CC-BY-SA-3.0 </span><i class="fa fa-star"></i><span> Yourname</span></div><div class="by_farbox"><span>Powered by </span><a href="https://hexo.io/zh-cn/" target="_blank">Hexo </a><span> & </span><a href="https://github.com/Lhcfl/hexo-theme-anatolo" target="_blank">Anatolo </a></div><div class="beian"></div></div></div><div class="main"><div class="autopagerize_page_element"><div class="content"><div class="post-page"><div class="post animated fadeInDown"><div class="post-title"><h3><a>分库分表--概览</a></h3></div><div class="post-content"><p><p>今天，我们来瞎掰扯掰扯Mysql分库分表相关内容～</p>
+<h3 id="什么是分库分表"><a href="#什么是分库分表" class="headerlink" title="什么是分库分表"></a>什么是分库分表</h3><h4 id="分表"><a href="#分表" class="headerlink" title="分表"></a>分表</h4><p>比如我们的单表数据量已经达到几千万了，单表数据量这么大，会极大的影响sql的执行性能。单表数据量在几百万的时候，性能就会相对差一点，就应该考虑分表了。</p>
+<p>分表是什么意思呢？就是将一个表的数据放到多个表中，然后查询的时候就查询一个表。比如按照UserID来进行分表，将一个用户的数据存放在一个表中，然后操作这个用户的时候就操作一个表就好了。这样可以控制每个表的数据量在200w左右</p>
+<h4 id="分库"><a href="#分库" class="headerlink" title="分库"></a>分库</h4><p>mysql单库最多支持2000的并发，当并发达到这个值的时候就必须要扩容了，而且一个健康的单库并发应该在1000左右，不要太大。可以将一个库的数据拆分到多个库中，访问的时候就访问一个库好了。</p>
+<h3 id="如何去对数据库做拆分？水平拆分还是垂直拆分"><a href="#如何去对数据库做拆分？水平拆分还是垂直拆分" class="headerlink" title="如何去对数据库做拆分？水平拆分还是垂直拆分"></a>如何去对数据库做拆分？水平拆分还是垂直拆分</h3><p><strong>水平拆分</strong>就是把一个表的数据给弄到多个库的多个表里去，但是每个表的表结构都是一样的，不过每个表里数据是不相同的，所有库表的数据加起来就是全部的数据。<strong>水平拆分的意义</strong>在于将数据均匀放在更多的库表，然后用更多的库表来抗并发，同时也保证每个表的数据量不会太多，影响查询效率。</p>
+<p><strong>垂直拆分</strong>就是把一个有很多字段的表给拆分成多个表，或者是多个库上去，每个表的表结构都不一样，每个库表都包含一部分的字段。一般来说，会将较少的访问频率较高的字段放到一个表里去，然后将较多的访问频率较低的字段存放到另一个表里去。</p>
+<h3 id="在项目中该如何去做拆分？"><a href="#在项目中该如何去做拆分？" class="headerlink" title="在项目中该如何去做拆分？"></a>在项目中该如何去做拆分？</h3><p>在项目中，一般来说垂直拆分，你可以在表层面来做，对一些字段特别多的表做一下拆分；水平拆分，你可以说是并发承载不了，或者是数据量太大，容量承载不了，去按照某个字段做水平拆分。<br><strong>分库分表方式</strong>：按照某个字段 hash 一下均匀分散，这个较为常用。好处在于说，可以平均分配每个库的数据量和请求压力；</p>
+<h3 id="我们如何去做迁移？如何无损的迁移？（迁移全流程）"><a href="#我们如何去做迁移？如何无损的迁移？（迁移全流程）" class="headerlink" title="我们如何去做迁移？如何无损的迁移？（迁移全流程）"></a>我们如何去做迁移？如何无损的迁移？（迁移全流程）</h3><ol>
+<li>首先，我们保持原有的单写，写到旧的数据库中，然后先通过脚本把一些静态的数据（就是哪些不需要修改的数据）进行迁移，迁移完了之后去验证数据的准确性。</li>
+<li>配置新的数据库，然后开启双写，还是旧的数据库提供读，然后再去迁移哪些动态数据，迁移完了之后验证动态数据的准确性</li>
+<li>最后我们在切换数据源，切换到新的数据库，验证是否有问题，有问题就切会旧的</li>
+<li>关闭双写 迁移完成。</li>
+</ol>
+<h3 id="分库分表之后，主键ID怎么处理？"><a href="#分库分表之后，主键ID怎么处理？" class="headerlink" title="分库分表之后，主键ID怎么处理？"></a>分库分表之后，主键ID怎么处理？</h3><p>分布式ID：<a target="_blank" rel="noopener" href="https://cloud.tencent.com/developer/article/2149830">https://cloud.tencent.com/developer/article/2149830</a></p>
+</p></div><div class="post-footer"><div class="tip">本文采用CC-BY-SA-3.0协议，转载请注明出处<br>Author: Yourname</div><div class="meta"><div class="info"><i class="fa fa-sun-o"></i><span class="date">2023-09-07</span><i class="fa fa-tag"></i><a class="tag" href="/tags/mysql/" title="mysql">mysql </a><span class="leancloud_visitors"></span><span>About 929 words, 3 min 5 sec  read</span></div></div></div></div><div class="share"><div class="evernote"><a class="fa fa-bookmark" href="" onclick="javascript:join_favorite()" ref="sidebar"></a></div><div class="weibo"><a class="fa fa-weibo" href="javascript:void((function(s,d,e){try{}catch(e){}var f='http://service.weibo.com/share/share.php?',u=d.location.href,p=['url=',e(u),'&amp;title=',e(d.title),'&amp;appkey=2924220432'].join('');function a(){if(!window.open([f,p].join(''),'mb',['toolbar=0,status=0,resizable=1,width=620,height=450,left=',(s.width-620)/2,',top=',(s.height-450)/2].join('')))u.href=[f,p].join('');};if(/Firefox/.test(navigator.userAgent)){setTimeout(a,0)}else{a()}})(screen,document,encodeURIComponent));"></a></div><div class="twitter"><a class="fa fa-twitter" target="_blank" rel="noopener" href="http://twitter.com/intent/tweet?text=I%20have%20found%20a%20great%20blog.%0A%0A%E9%99%88sir%E7%88%B1%E7%8B%82%E6%89%81%20%C2%B7%20%E5%88%86%E5%BA%93%E5%88%86%E8%A1%A8--%E6%A6%82%E8%A7%88%0Ahttps://cheny-alf.github.io/2023/09/07/sub-table/%0A"></a></div></div><div class="pagination"><ul class="clearfix"><li class="pre pagbuttons"><a class="btn" role="navigation" href="/2023/09/08/mysql-sql%E4%BC%98%E5%8C%96/" title="SQL进阶使用技巧">Previous</a></li><li class="next pagbuttons"><a class="btn" role="navigation" href="/2023/09/02/mysql-read-write/" title="mysql-read-write">Next</a></li></ul></div><script src="/js/visitors.js"></script></div></div></div></div><script src="/js/darkLightToggle.js"></script><script src="/js/jquery-migrate-1.2.1.min.js"></script><script src="/js/jquery.appear.js"></script><script src="/js/add-bookmark.js"></script><script>(function(window){var INSIGHT_CONFIG={TRANSLATION:{POSTS:"Posts",PAGES:"Pages",CATEGORIES:"Categories",TAGS:"Tags",UNTITLED:"(Untitled)",},CONTENT_URL:"/content.json",};window.INSIGHT_CONFIG=INSIGHT_CONFIG})(window);</script><script src="/js/insight.js" defer></script><div class="searchbox ins-search"><div class="searchbox-container ins-search-container"><div class="searchbox-input-wrapper"><input class="searchbox-input ins-search-input" type="text" placeholder="Search..."><span class="searchbox-close"><a class="fa fa-times-circle" onclick="closeWindow();"></a></span></div><div class="searchbox-result-wrapper ins-section-wrapper"><div class="ins-section-container"><p>Seraching...</p></div></div></div></div></body></html>

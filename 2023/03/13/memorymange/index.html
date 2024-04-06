@@ -1,35 +1,17 @@
-extends partial/layout
-
-include mixins
-
-block site_title
-    != page.title + " · " + config.title
-
-block description
-    - var desc = page.desc || strip_html(page.content).replace(/^\s*/, '').replace(/\s*$/, '').substring(0, 150);
-    meta(name="description", content=desc)
-
-block content
-  .autopagerize_page_element: .content: .post-page
-    include mixins
-    +make_post(page, true)
-    .share
-      .evernote
-        a.fa.fa-bookmark(href="",onclick="javascript:join_favorite()", ref="sidebar")
-      .weibo
-        a.fa.fa-weibo(href="javascript:void((function(s,d,e){try{}catch(e){}var f='http://service.weibo.com/share/share.php?',u=d.location.href,p=['url=',e(u),'&title=',e(d.title),'&appkey=2924220432'].join('');function a(){if(!window.open([f,p].join(''),'mb',['toolbar=0,status=0,resizable=1,width=620,height=450,left=',(s.width-620)/2,',top=',(s.height-450)/2].join('')))u.href=[f,p].join('');};if(/Firefox/.test(navigator.userAgent)){setTimeout(a,0)}else{a()}})(screen,document,encodeURIComponent));")
-      .twitter
-        - var twitter_text = encodeURI(__('Share_text') + "\n\n" + config.title+" · "+page.title+"\n"+config.url+"/"+page.path+"\n")
-        a.fa.fa-twitter(href=url_for("http://twitter.com/intent/tweet?text="+ twitter_text))
-    - var prev = page.prev ? page.prev.path : false;
-    - var next = page.next ? page.next.path : false;
-    .pagination
-      ul.clearfix
-        if prev
-          li.pre.pagbuttons
-            a.btn(role="navigation",href=url_for(prev), title=page.prev.title)!= __('prev_post')
-        if next
-          li.next.pagbuttons
-            a.btn(role="navigation",href=url_for(next), title=page.next.title)!= __('next_post')
-    if page.comments
-        include partial/comments
+<!DOCTYPE html><html lang="zh-CN" id="theme-light-mode"><head><meta charset="utf-8"><meta name="X-UA-Compatible" content="IE=edge"><meta name="author" content="Yourname"><title>go-面试-内存管理 · 陈sir爱狂扁</title><meta name="description" content="&amp;emsp;&amp;emsp;&amp;emsp;这是一篇关于golang面试题的文章，主要是记录本人在面试过程中常见的一些题目以及自己认为可能会考察的面试题。当然里面的内容也是用我自己的话术来总结的，可能存在不严谨的地方，还望指出！！！
+内存管理
+内存分配首先Go程序启动的时候会申请一个比较大的内存，然后把这个"><meta name="keywords" content="Blog,博客,Hexo"><meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0" name="viewport"><meta content="yes" name="apple-mobile-web-app-capable"><meta content="black" name="apple-mobile-web-app-status-bar-style"><meta content="telephone=no" name="format-detection"><meta name="renderer" content="webkit"><link rel="shortcut icon" type="image/x-icon" href="/images/favicon.webp"><link rel="stylesheet" href="/css/style.css"><link rel="stylesheet" href="/css/blog_basic.css"><link rel="stylesheet" href="/css/font-awesome.min.css"><link rel="stylesheet" href="/css/insight.css"><link rel="stylesheet" href="/css/search.css"><link rel="alternate" type="application/atom+xml" title="ATOM 1.0" href="/atom.xml"><script src="/js/jquery.js"></script><meta name="generator" content="Hexo 6.3.0"></head><body><div class="page-top animated fadeInDown"><div class="nav"><li> <a href="/">Home</a></li><li> <a href="/archives">Archives</a></li><li> <a href="/tags">Tags</a></li><li> <a href="/about">About</a></li><li> <a href="/links">Links</a></li></div><div class="information"><div class="nav_right_btn"><li><a class="fa fa-chevron-left" onclick="window.history.go(-1)"> </a></li><li><a class="fa fa-search" onclick="openWindow();"></a></li><li><a class="fa fa-sun-o" onclick="darkLightToggle();"></a></li></div><div class="avatar"><img src="/images/logo.webp"></div></div></div><div class="sidebar animated fadeInDown"><div class="sidebar-top"><div class="logo-title"><div class="title"><img src="/images/logo@2x.webp" style="width:220px;" alt="favicon"><h3 title=""><a href="/">陈sir爱狂扁</a></h3><div class="description"><p>A simple and beautiful blog</p></div></div><ul class="social-links"><li><a target="_blank" rel="noopener" href="https://github.com/Lhcfl"><i class="fa fa-github"></i></a></li><li><a href="mailto:yourname@example.com"><i class="fa fa-envelope"></i></a></li></ul></div></div><div class="footer"><div class="p"> <span> 全站CC-BY-SA-3.0 </span><i class="fa fa-star"></i><span> Yourname</span></div><div class="by_farbox"><span>Powered by </span><a href="https://hexo.io/zh-cn/" target="_blank">Hexo </a><span> & </span><a href="https://github.com/Lhcfl/hexo-theme-anatolo" target="_blank">Anatolo </a></div><div class="beian"></div></div></div><div class="main"><div class="autopagerize_page_element"><div class="content"><div class="post-page"><div class="post animated fadeInDown"><div class="post-title"><h3><a>go-面试-内存管理</a></h3></div><div class="post-content"><p><p>&emsp;&emsp;&emsp;这是一篇关于golang面试题的文章，主要是记录本人在面试过程中常见的一些题目以及自己认为可能会考察的面试题。当然里面的内容也是用我自己的话术来总结的，可能存在不严谨的地方，还望指出！！！</p>
+<h2 id="内存管理"><a href="#内存管理" class="headerlink" title="内存管理"></a>内存管理</h2><ol>
+<li>内存分配<br>首先Go程序启动的时候会申请一个比较大的内存，然后把这个分成<code>spans、bitmap、arena区</code>，arena区也就是堆区，spans和bitmap是用来管理arena，span是内存管理的基本单元，用于管理特定的class对象，class对象是一开始已经计算好、存储好的变量，记录来对应大小的<code>classID</code>，然后小对象类型的堆对象就会根据它的大小，分配到对应设定好的mspan上分配内存，然后就要有一个数据结构来挂你这个span，就是<code>mcnetral</code>.<br>各个线程需要内存的时候就从mcentral的span中申请内存，为了避免多线程竞争，导致不停的加锁的情况，Go为每个线程分配了span缓存，就是<code>mcache</code>.<br>mchche中如果没有的话再去mcentral中申请，mcentral的数据结构是有个属性是记录classID，所以他是管理特定的class的span，也就是每个class都会有一个mcentral,这个mcentral的集合存放在mheap中，mheap也就是管理全部的内存，然后刚刚在mcentral中申请不到可用的span，就是从mheap中申请一个新的span。</li>
+<li>垃圾回收<br>Go采用的是三色标记法，采用的回收算法是标记清楚算法，垃圾回收时，从root对象节点扫描，第一次扫描完把root对象标记为黑色，把root对象引用的对象标记为灰色，其余为白色，然后再以灰色的对象继续往下扫描，直到没有其他引用，然后白色对象会被回收，黑色保留，在垃圾回收的时候会stw，会停掉所有的goroutine，专心做回收，等垃圾回收结束后再恢复goroutine</li>
+<li>写屏障<br>类似一个开关，在GC的特定时刻开启，开启后指针传递会标记指针，即本轮不再回收，下次GC的时候再确定</li>
+<li>触发GC时机<br>a.达到阈值（每当内存扩大一倍时）<br>b.每2分钟触发一次<br>c.runtime.gc来手动触发。</li>
+<li>逃逸分析<br>决定内存是要分配在堆上还是栈上</li>
+<li>逃逸分析的情况</li>
+</ol>
+<ul>
+<li>指针逃逸，返回局部变量的指针</li>
+<li>栈空间不足逃逸：比如当前存放一个length为10000的int切片或者无法在编译时判断当前切片的长度</li>
+<li>动态类型逃逸：函数的参数为interface类型，无法在编译期间确定其参数类型</li>
+</ul>
+</p></div><div class="post-footer"><div class="tip">本文采用CC-BY-SA-3.0协议，转载请注明出处<br>Author: Yourname</div><div class="meta"><div class="info"><i class="fa fa-sun-o"></i><span class="date">2023-03-13</span><a class="tag" href="/categories/Golang/" title="Golang">Golang </a><i class="fa fa-tag"></i><a class="tag" href="/tags/Golang/" title="Golang">Golang </a><i class="fa fa-tag"></i><a class="tag" href="/tags/面试/" title="面试">面试 </a><span class="leancloud_visitors"></span><span>About 790 words, 2 min 38 sec  read</span></div></div></div></div><div class="share"><div class="evernote"><a class="fa fa-bookmark" href="" onclick="javascript:join_favorite()" ref="sidebar"></a></div><div class="weibo"><a class="fa fa-weibo" href="javascript:void((function(s,d,e){try{}catch(e){}var f='http://service.weibo.com/share/share.php?',u=d.location.href,p=['url=',e(u),'&amp;title=',e(d.title),'&amp;appkey=2924220432'].join('');function a(){if(!window.open([f,p].join(''),'mb',['toolbar=0,status=0,resizable=1,width=620,height=450,left=',(s.width-620)/2,',top=',(s.height-450)/2].join('')))u.href=[f,p].join('');};if(/Firefox/.test(navigator.userAgent)){setTimeout(a,0)}else{a()}})(screen,document,encodeURIComponent));"></a></div><div class="twitter"><a class="fa fa-twitter" target="_blank" rel="noopener" href="http://twitter.com/intent/tweet?text=I%20have%20found%20a%20great%20blog.%0A%0A%E9%99%88sir%E7%88%B1%E7%8B%82%E6%89%81%20%C2%B7%20go-%E9%9D%A2%E8%AF%95-%E5%86%85%E5%AD%98%E7%AE%A1%E7%90%86%0Ahttps://cheny-alf.github.io/2023/03/13/memorymange/%0A"></a></div></div><div class="pagination"><ul class="clearfix"><li class="pre pagbuttons"><a class="btn" role="navigation" href="/2023/03/14/concurrent/" title="go-面试-并发控制">Previous</a></li><li class="next pagbuttons"><a class="btn" role="navigation" href="/2023/03/13/interview/" title="interview">Next</a></li></ul></div><script src="/js/visitors.js"></script></div></div></div></div><script src="/js/darkLightToggle.js"></script><script src="/js/jquery-migrate-1.2.1.min.js"></script><script src="/js/jquery.appear.js"></script><script src="/js/add-bookmark.js"></script><script>(function(window){var INSIGHT_CONFIG={TRANSLATION:{POSTS:"Posts",PAGES:"Pages",CATEGORIES:"Categories",TAGS:"Tags",UNTITLED:"(Untitled)",},CONTENT_URL:"/content.json",};window.INSIGHT_CONFIG=INSIGHT_CONFIG})(window);</script><script src="/js/insight.js" defer></script><div class="searchbox ins-search"><div class="searchbox-container ins-search-container"><div class="searchbox-input-wrapper"><input class="searchbox-input ins-search-input" type="text" placeholder="Search..."><span class="searchbox-close"><a class="fa fa-times-circle" onclick="closeWindow();"></a></span></div><div class="searchbox-result-wrapper ins-section-wrapper"><div class="ins-section-container"><p>Seraching...</p></div></div></div></div></body></html>
