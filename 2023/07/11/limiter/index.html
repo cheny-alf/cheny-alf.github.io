@@ -28,7 +28,7 @@
 <meta property="og:description" content="限流指的是系统在面对高并发、大流量的场景下，采用一些手段来限制新的流量对系统对访问，从而保证我们服务对稳定性。常见对算法有 计数器算法、漏斗算法以及令牌桶算法，下面我们分别对这三种算法进行介绍与实现。注：本次实现采用 golang + redis 限流方案假设我们当前要完成一个关于限流的需求，要求某个接口一分钟内最多只能请求100次，并且采用redis实现。 计数器算法计数器算法相对来说是比较简单">
 <meta property="og:locale" content="en_US">
 <meta property="article:published_time" content="2023-07-11T05:32:58.000Z">
-<meta property="article:modified_time" content="2023-08-11T12:04:24.376Z">
+<meta property="article:modified_time" content="2024-04-26T05:41:37.777Z">
 <meta property="article:author" content="John Doe">
 <meta property="article:tag" content="golang">
 <meta property="article:tag" content="redis">
@@ -154,7 +154,7 @@
       <div class="category-box">
             <a class="category-link" href="/categories/Golang/">
                 Golang
-                <div class="category-count">7</div>
+                <div class="category-count">1</div>
             </a>
         
             <a class="category-link" href="/categories/%E5%BB%B6%E8%BF%9F%E9%98%9F%E5%88%97/">
@@ -172,14 +172,9 @@
                 <div class="category-count">1</div>
             </a>
         </div></div></div></div>
-            <a class="category-link" href="/categories/Kafka/">
-                Kafka
-                <div class="category-count">1</div>
-            </a>
-        
-            <a class="category-link" href="/categories/Redis/">
-                Redis
-                <div class="category-count">2</div>
+            <a class="category-link" href="/categories/%E6%8A%80%E6%9C%AF/">
+                技术
+                <div class="category-count">19</div>
             </a>
         </div>
     </div>
@@ -191,7 +186,7 @@
   <div class="widget-wrap">
     <div class="widget">
       <h3 class="widget-title">Tags</h3>
-      <ul class="widget-tag-list" itemprop="keywords"><li class="widget-tag-list-item"><a class="widget-tag-list-link" href="/tags/Golang/" rel="tag">Golang</a></li><li class="widget-tag-list-item"><a class="widget-tag-list-link" href="/tags/Kafka/" rel="tag">Kafka</a></li><li class="widget-tag-list-item"><a class="widget-tag-list-link" href="/tags/Redis/" rel="tag">Redis</a></li><li class="widget-tag-list-item"><a class="widget-tag-list-link" href="/tags/golang/" rel="tag">golang</a></li><li class="widget-tag-list-item"><a class="widget-tag-list-link" href="/tags/mysql/" rel="tag">mysql</a></li><li class="widget-tag-list-item"><a class="widget-tag-list-link" href="/tags/redis/" rel="tag">redis</a></li><li class="widget-tag-list-item"><a class="widget-tag-list-link" href="/tags/%E5%BB%B6%E8%BF%9F%E9%98%9F%E5%88%97/" rel="tag">延迟队列</a></li><li class="widget-tag-list-item"><a class="widget-tag-list-link" href="/tags/%E6%97%B6%E5%BA%8F%E6%95%B0%E6%8D%AE%E5%BA%93TSDB/" rel="tag">时序数据库TSDB</a></li><li class="widget-tag-list-item"><a class="widget-tag-list-link" href="/tags/%E7%9F%A5%E8%AF%86%E7%82%B9/" rel="tag">知识点</a></li><li class="widget-tag-list-item"><a class="widget-tag-list-link" href="/tags/%E9%99%90%E6%B5%81/" rel="tag">限流</a></li><li class="widget-tag-list-item"><a class="widget-tag-list-link" href="/tags/%E9%9D%A2%E8%AF%95/" rel="tag">面试</a></li></ul>
+      <ul class="widget-tag-list" itemprop="keywords"><li class="widget-tag-list-item"><a class="widget-tag-list-link" href="/tags/Golang/" rel="tag">Golang</a></li><li class="widget-tag-list-item"><a class="widget-tag-list-link" href="/tags/Kafka/" rel="tag">Kafka</a></li><li class="widget-tag-list-item"><a class="widget-tag-list-link" href="/tags/Redis/" rel="tag">Redis</a></li><li class="widget-tag-list-item"><a class="widget-tag-list-link" href="/tags/golang/" rel="tag">golang</a></li><li class="widget-tag-list-item"><a class="widget-tag-list-link" href="/tags/k8s/" rel="tag">k8s</a></li><li class="widget-tag-list-item"><a class="widget-tag-list-link" href="/tags/mysql/" rel="tag">mysql</a></li><li class="widget-tag-list-item"><a class="widget-tag-list-link" href="/tags/redis/" rel="tag">redis</a></li><li class="widget-tag-list-item"><a class="widget-tag-list-link" href="/tags/%E5%BB%B6%E8%BF%9F%E9%98%9F%E5%88%97/" rel="tag">延迟队列</a></li><li class="widget-tag-list-item"><a class="widget-tag-list-link" href="/tags/%E6%97%B6%E5%BA%8F%E6%95%B0%E6%8D%AE%E5%BA%93TSDB/" rel="tag">时序数据库TSDB</a></li><li class="widget-tag-list-item"><a class="widget-tag-list-link" href="/tags/%E7%9F%A5%E8%AF%86%E7%82%B9/" rel="tag">知识点</a></li><li class="widget-tag-list-item"><a class="widget-tag-list-link" href="/tags/%E9%99%90%E6%B5%81/" rel="tag">限流</a></li><li class="widget-tag-list-item"><a class="widget-tag-list-link" href="/tags/%E9%9D%A2%E8%AF%95/" rel="tag">面试</a></li></ul>
     </div>
   </div>
 
@@ -230,13 +225,13 @@
           <div class="need-seperator meta-info">
             <div class="meta-cate-flex">
   
-    Uncategorized 
+  <a class="meta-cate-link" href="/categories/%E6%8A%80%E6%9C%AF/">技术</a>
    
 </div>
   
           </div>
           <div class="wordcount need-seperator meta-info">
-             words 
+            1.3k words 
           </div>
         </div>
         
