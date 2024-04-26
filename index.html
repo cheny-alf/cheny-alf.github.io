@@ -1,262 +1,1015 @@
-<!DOCTYPE html><html lang="zh-CN" id="theme-light-mode"><head><meta charset="utf-8"><meta name="X-UA-Compatible" content="IE=edge"><meta name="author" content="Yourname"><title>陈sir爱狂扁</title><meta name="description" content="A simple and beautiful blog"><meta name="keywords" content="Blog,博客,Hexo"><meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0" name="viewport"><meta content="yes" name="apple-mobile-web-app-capable"><meta content="black" name="apple-mobile-web-app-status-bar-style"><meta content="telephone=no" name="format-detection"><meta name="renderer" content="webkit"><link rel="shortcut icon" type="image/x-icon" href="/images/favicon.webp"><link rel="stylesheet" href="/css/style.css"><link rel="stylesheet" href="/css/blog_basic.css"><link rel="stylesheet" href="/css/font-awesome.min.css"><link rel="stylesheet" href="/css/insight.css"><link rel="stylesheet" href="/css/search.css"><link rel="alternate" type="application/atom+xml" title="ATOM 1.0" href="/atom.xml"><script src="/js/jquery.js"></script><meta name="generator" content="Hexo 6.3.0"></head><body><div class="page-top animated fadeInDown"><div class="nav"><li> <a class="current" href="/">Home</a></li><li> <a href="/archives">Archives</a></li><li> <a href="/tags">Tags</a></li><li> <a href="/about">About</a></li><li> <a href="/links">Links</a></li></div><div class="information"><div class="nav_right_btn"><li><a class="fa fa-chevron-left" onclick="window.history.go(-1)" style="display:none;"> </a></li><li><a class="fa fa-search" onclick="openWindow();"></a></li><li><a class="fa fa-sun-o" onclick="darkLightToggle();"></a></li></div><div class="avatar"><img src="/images/logo.webp"></div></div></div><div class="sidebar animated fadeInDown"><div class="sidebar-top"><div class="logo-title"><div class="title"><img src="/images/logo@2x.webp" style="width:220px;" alt="favicon"><h3 title=""><a href="/">陈sir爱狂扁</a></h3><div class="description"><p>A simple and beautiful blog</p></div></div><ul class="social-links"><li><a target="_blank" rel="noopener" href="https://github.com/Lhcfl"><i class="fa fa-github"></i></a></li><li><a href="mailto:yourname@example.com"><i class="fa fa-envelope"></i></a></li></ul></div></div><div class="footer"><div class="p"> <span> 全站CC-BY-SA-3.0 </span><i class="fa fa-star"></i><span> Yourname</span></div><div class="by_farbox"><span>Powered by </span><a href="https://hexo.io/zh-cn/" target="_blank">Hexo </a><span> & </span><a href="https://github.com/Lhcfl/hexo-theme-anatolo" target="_blank">Anatolo </a></div><div class="beian"></div></div></div><div class="main"><div class="autopagerize_page_element"><div class="content"><div class="post animated fadeInDown"><div class="post-title"><h3><a href="/2024/04/24/%E3%80%8A%E6%B7%B1%E5%85%A5%E5%89%96%E6%9E%90k8s%E3%80%8B%E7%AC%94%E8%AE%B0-1-%E5%AE%B9%E5%99%A8%E6%8A%80%E6%9C%AF%E5%9F%BA%E7%A1%80/">《深入剖析k8s》笔记--(1)容器技术基础</a></h3></div><div class="post-content"><div class="card"><p><p>最近在学习k8s，主要是阅读《深入剖析Kubernetes》这本书籍，同时也会跟着这本书去实践。</p>
-</p></div></div><div class="post-footer"><div class="meta"><div class="info"><i class="fa fa-sun-o"></i><span class="date">2024-04-24</span><span class="leancloud_visitors"></span><span>About 38 words, 7 sec  read</span></div></div></div></div><div class="post animated fadeInDown"><div class="post-title"><h3><a href="/2024/04/24/%E3%80%8A%E6%B7%B1%E5%85%A5%E5%89%96%E6%9E%90k8s%E3%80%8B-4-k8s%E9%9B%86%E7%BE%A4%E6%90%AD%E5%BB%BA/">《深入剖析k8s》--(4)k8s集群搭建</a></h3></div><div class="post-content"><div class="card"><p><p>接下来，我们将按照书中的步骤，我们直接采用4.2小节<code>从0到1：搭建一个完成的Kubernetes集群</code></p>
-<ol>
-<li>安装docker<br><br>我们已经提前安装好docker了，跳过docker<br></li>
-<li>安装kubeadm<br><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">sudo apt-get update</span><br><span class="line">sudo apt-get install -y apt-transport-https</span><br><span class="line">curl -fsSL https://packages.cloud.google.com/apt/doc/apt-key.gpg | sudo gpg --dearmor -o /etc/apt/keyrings/kubernetes-archive-keyring.gpg</span><br><span class="line">echo &quot;deb [signed-by=/etc/apt/keyrings/kubernetes-archive-keyring.gpg] https://apt.kubernetes.io/ kubernetes-xenial main&quot; | sudo tee /etc/apt/sources.list.d/kubernetes.list</span><br><span class="line">sudo apt-get update</span><br><span class="line">sudo apt-get install -y kubelet kubeadm kubectl</span><br><span class="line">sudo apt-mark hold kubelet kubeadm kubectl # 关闭这三个程序的自动更新</span><br></pre></td></tr></table></figure>
-当然在这个过程中，可能会碰到问题，eg:无法连接packages.cloud.google.com<br><br>第三步:我们可能download不下来，参考这个👉<a target="_blank" rel="noopener" href="https://github.com/kubernetes/k8s.io/pull/4837#issuecomment-1446426585">issue</a><br><br>但是当时似乎这个方式也没有生效 我将其替换成了 <code>https://mirrors.aliyun.com/kubernetes/apt/doc/apt-key.gpg</code><br>第四步:将<a target="_blank" rel="noopener" href="https://apt.kubernetes.io/">https://apt.kubernetes.io/</a> 替换成 <code>https://mirrors.aliyun.com/kubernetes/apt/</code> 或者其他源</li>
-<li>接下来编写kubeadm.yaml文件<br><br>结合书中的内容，然后做了一点修改，可以直接使用🤔<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line">apiVersion: kubeadm.k8s.io/v1beta3</span><br><span class="line">kind: InitConfiguration</span><br><span class="line">nodeRegistration:</span><br><span class="line">  kubeletExtraArgs:</span><br><span class="line">    cgroup-driver: &quot;systemd&quot;</span><br><span class="line">---</span><br><span class="line">apiVersion: kubeadm.k8s.io/v1beta3</span><br><span class="line">kind: ClusterConfiguration</span><br><span class="line">kubernetesVersion: &quot;v1.28.2&quot;</span><br><span class="line">imageRepository: registry.aliyuncs.com/google_containers</span><br><span class="line">clusterName: &quot;example-cluster&quot;</span><br><span class="line">controllerManager:</span><br><span class="line">  extraArgs:</span><br><span class="line">    horizontal-pod-autoscaler-sync-period: &quot;10s&quot;</span><br><span class="line">    node-monitor-grace-period: &quot;10s&quot;</span><br><span class="line">apiServer:</span><br><span class="line">  extraArgs:</span><br><span class="line">    runtime-config: &quot;api/all=true&quot;</span><br></pre></td></tr></table></figure></li>
-<li>执行init<br><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">kubeadm init --config kubeadm.yaml</span><br></pre></td></tr></table></figure>
-init的过程中可能会碰到如下的问题：<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">[kubelet-check] Initial timeout of 40s passed.</span><br><span class="line"></span><br><span class="line">Unfortunately, an error has occurred:</span><br><span class="line">        timed out waiting for the condition</span><br><span class="line"></span><br><span class="line">This error is likely caused by:</span><br><span class="line">        - The kubelet is not running</span><br><span class="line">        - The kubelet is unhealthy due to a misconfiguration of the node in some way (required cgroups disabled)</span><br></pre></td></tr></table></figure>
-解决思路：<br></li>
-</ol>
-<ul>
-<li>把报错信息拿到往上搜索🔍，果然不出所料，没有什么进展。</li>
-<li>翻阅kubeadm的issue，查看到相关的问题<a target="_blank" rel="noopener" href="https://github.com/kubernetes/kubeadm/issues/2851#issuecomment-1535770518">问题</a>,按照他的解决办法成功解决这个问题。</li>
-</ul>
-<ol start="5">
-<li>初次使用kubernetes，需要执行如下命令<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">mkdir -p $HOME/.kube</span><br><span class="line">sudo cp -i /etc/kubernetes/admin.conf $HOME/.kube/config</span><br><span class="line">sudo chown $(id -u):$(id -g) $HOME/.kube/config</span><br></pre></td></tr></table></figure></li>
-<li>尝试使用kubectl describe node master<br><code>The connection to the server 10.0.8.4:6443 was refused - did you specify the right host or port?</code> 又出问题了！！<br><br>参考这个解决办法👉<a target="_blank" rel="noopener" href="https://stackoverflow.com/questions/56737867/the-connection-to-the-server-x-x-x-6443-was-refused-did-you-specify-the-right">解决办法</a></li>
-<li>部署网络插件<br><code>kubectl apply -f &quot;https://cloud.weave.works/k8s/net?k8s-version=$(kubectl version | base64 | tr -d &#39;\n&#39;)</code><br><br>很不幸，这一步又报错了<code>Unable to connect to the server: dial tcp: lookup cloud.weave.works on 183.60.83.19:53: no such host</code><br><br>参考这个解决办法👉<code>kubectl apply -f https://github.com/weaveworks/weave/releases/download/v2.8.1/weave-daemonset-k8s-1.11.yaml</code></li>
-<li>最后我们再查看我们的pod情况 kubectl get pods -n kube-system<br><img src="/../images/imgk8s.png" alt="img.png"><br>撒花🎉 完结</li>
-</ol>
-</p></div></div><div class="post-footer"><div class="meta"><div class="info"><i class="fa fa-sun-o"></i><span class="date">2024-04-24</span><span class="leancloud_visitors"></span><span>About 659 words, 2 min 11 sec  read</span></div></div></div></div><div class="post animated fadeInDown"><div class="post-title"><h3><a href="/2024/03/06/optimization/">记录一次接口优化过程</a></h3></div><div class="post-content"><div class="card"><p><h1 id="一、背景"><a href="#一、背景" class="headerlink" title="一、背景"></a>一、背景</h1><p>一个接口执行的业务逻辑是返回区区域范围内所有停车场的热度值用于热力图渲染，发现这个接口响应时间普通在2.4s左右，影响前端热力图加载速度</p>
-<h1 id="二、业务逻辑"><a href="#二、业务逻辑" class="headerlink" title="二、业务逻辑"></a>二、业务逻辑</h1><p><img src="/../images/optimization_flow.png" alt="optimization_flow.png"><br>这个接口中共有3个数据查询操作<br><br>获取区域信息：获取城市下各街道区域信息，全表数据量级19条， 本业务涉及10条,因数据量比较少，所以忽略此sql查询对耗时影响</p>
-</p></div></div><div class="post-footer"><div class="meta"><div class="info"><i class="fa fa-sun-o"></i><span class="date">2024-03-06</span><i class="fa fa-tag"></i><a class="tag" href="/tags/mysql/" title="mysql">mysql </a><span class="leancloud_visitors"></span><span>About 144 words, 28 sec  read</span></div></div></div></div><div class="post animated fadeInDown"><div class="post-title"><h3><a href="/2024/01/06/tsdb/">时序数据库中的聚合计算：加速洞察与优化性能(上)</a></h3></div><div class="post-content"><div class="card"><p><h1 id="1-引言"><a href="#1-引言" class="headerlink" title="1. 引言"></a>1. 引言</h1><p>在当今数据驱动的世界中，时序数据库（TSDB）已成为处理和分析时间序列数据的关键工具。随着物联网（IoT）设备的激增和实时数据流的爆炸性增长，对高效处理和分析这些数据的需求日益迫切。聚合计算，作为TSDB的一个核心功能，为用户在海量时序数据中快速提取有价值信息提供了可能。</p>
-<h1 id="2-名词解释"><a href="#2-名词解释" class="headerlink" title="2. 名词解释"></a>2. 名词解释</h1><p><strong>TSDB</strong>: Time Series Database，时序数据库，用于保存时间序列（按时间顺序变化）的海量数据。<br><strong>metric</strong>: 度量，如发动机的温度、转速等。metric相当于关系型数据库中的table。<br><strong>timestamp</strong>: 时间戳，格林威治时间1970年01月01日00时00分00秒(北京时间1970年01月01日08时00分00秒)起至现在的总毫秒数。<br><strong>field</strong>: 度量下的不同字段，譬如位置这个度量下可以有经度和纬度两个字段。每个字段有相应的数值，如56°C、1000r&#x2F;s等（实际中不带单位）。<br><strong>tag</strong>: 标签，或附加属性，一个tag是一个key-value对，用于提供额外的信息，如“型号&#x3D;ABC123”、“出厂编号&#x3D;1234567890”等。<br><strong>row</strong>: 数据行，“一个metric + m个field + n个tag + 一个timestamp”定义了一个数据行，一个row由m个data point组成。<br><strong>data point</strong>: 数据点，“一个metric + 一个field + n个tag + 一个timestamp”唯一定义了一个数据点。<br><strong>time series</strong>: 时间序列，“一个metric + 一个field + n个tag”唯一定义了一个时间序列，一个time series相当于一个设备上的一个传感器收集到的所有数据。<br><strong>group</strong>: 分组，可以按tag对data point进行分组。<br><strong>aggregator</strong>: 聚合函数，可以对一段时间的data point做聚合，如每10分钟的和值、平均值、最大值、最小值等。<br><strong>database</strong>: 数据库，一个用户可以有多个database，一个database可以写入多个metric的data point。metric相当于table，timestamp + 所有tag相当于primary key。<br>metric、timestamp、field、tag、row、data point、time series的关系如下图所示：<br><img src="/../images/img_tsdb.png" alt="img_tsdb.png"></p>
-<h1 id="3-架构设计"><a href="#3-架构设计" class="headerlink" title="3. 架构设计"></a>3. 架构设计</h1><h2 id="3-1总体架构设计"><a href="#3-1总体架构设计" class="headerlink" title="3.1总体架构设计"></a>3.1总体架构设计</h2><p><img src="/../images/img_struct.png" alt="img_stauct.png"><br>TSDB内部分为在线和离线两个部分。<br>在线部分主要是负责数据的实时读写，分为4层：</p>
-<ol>
-<li>接入层，又分为HTTP接入层和MySQL接入层，HTTP接入层负责提供对外的在线写入和查询接口，MySQL接入层提供基于MySQL的二进制协议的SQL查询接口，两者都提供认证鉴权和各种quota限制。</li>
-<li>索引层，负责根据metric和tag等字段对time series建立索引，实现time series的快速检索。</li>
-<li>分布式SQL层，负责将大数据量的SQL查询分拆成DAG（有向无环图）任务，在多个机器上并行完成，最后在接入层返回最终结果。</li>
-<li>数据层，又分为实时数据层和历史数据层，实时数据层负责存储最近写入的数据，当数据写入超过一天后，会进行压缩并写入历史数据层，最近半年为热数据，半年以上为冷数据，超过半年的热数据会自动迁移到冷数据存储。<br>离线部分主要是负责后台管理，如database的创建删除、导入导出等。</li>
-</ol>
-<h2 id="3-2-在线部分架构"><a href="#3-2-在线部分架构" class="headerlink" title="3.2 在线部分架构"></a>3.2 在线部分架构</h2><p><img src="/../images/img_online.png" alt="img_online.png"></p>
-<h3 id="3-2-1-接入层"><a href="#3-2-1-接入层" class="headerlink" title="3.2.1 接入层"></a>3.2.1 接入层</h3><p><strong>BaiduGateWay</strong>:  提供负载均衡的能力<br><strong>data api</strong>: 为用户提供在线的数据写入和查询服务，<br>写入时，data api将索引写入elasticsearch，同时将数据写入cassandra；查询时，data api先从elasticsearch查询索引，然后将查询拆分成DAG任务，并通过presto master申请资源，再发送给presto worker，presto worker进行分布式并行计算，得到最终的查询结果。<br>data api提供短连接的Restful API给用户调用。<br><strong>mysql adaptor</strong>: 为用户提供mysql二进制协议的长连接接入，从而使用户可以通过mysql jdbc&#x2F;odbc driver连接TSDB并进行SQL查询。查询路径与data api类似。</p>
-<h3 id="3-2-2-索引层"><a href="#3-2-2-索引层" class="headerlink" title="3.2.2 索引层"></a>3.2.2 索引层</h3><p><strong>elasticsearch</strong><br>我们对时序数据的metric、field、tag建立索引，从而保证这些字段能被快速的检索，同时还能支持地理位置的检索。<br>elasticsearch用于存储这些索引，data api在写入数据的同时，需要将索引写入elasticsearch；在查询数据之前，需要先从elasticsearch查询索引。<br>快速了解elasticsearch：<a target="_blank" rel="noopener" href="https://www.elastic.co/guide/en/elasticsearch/reference/current/documents-indices.html">https://www.elastic.co/guide/en/elasticsearch/reference/current/documents-indices.html</a></p>
-<h3 id="3-2-3-分布式SQL层"><a href="#3-2-3-分布式SQL层" class="headerlink" title="3.2.3 分布式SQL层"></a>3.2.3 分布式SQL层</h3><p><strong>presto master</strong>: 负责presto worker的发现，管理presto worker的资源，对任务进行调度，防止presto worker过载。<br>presto master是一个单点服务，但有一个standby做HA，primary挂掉之后，standby会成为新的primary，并从presto worker获取并恢复目前的资源分配状态，因此primary和standby之间不需要做状态同步。<br><strong>presto driver</strong>: 是集成在data api和mysql adaptor中的模块，负责对SQL进行解析、优化、DAG生成，然后调用presto master进行资源的分配，最后调用presto worker进行分布式并行计算。<br><strong>presto worker</strong>: 负责真正的计算任务的执行，由于执行任务是DAG的形式，所以presto worker之间存在互相访问。<br>为了减少网络开销，可以将presto worker和cassandra&#x2F;hbase部署在同一个机器上，presto master在分配presto worker时首先考虑数据的本地化。</p>
-<h3 id="3-2-3-数据层"><a href="#3-2-3-数据层" class="headerlink" title="3.2.3 数据层"></a>3.2.3 数据层</h3><p><strong>cassandra</strong><br>最近写入的数据会首先写入cassandra，cassandra中存储的是最近1天写入的数据，主要是利用cassandra吞吐量大、延迟低、高可用的特性。<br>快速了解cassandra：什么是Cassandra？<br><strong>hbase</strong><br>数据写入cassandra一天之后，会从cassandra读出并进行压缩，再写入ssd机器上的hbase。这里使用hbase是利用hbase可运维性好的特性。<br>在ssd集群的hbase里超过半年的数据，会被迁移到sata集群的hbase，并进行ec编码，使副本数从3下降到1.5，同时sata的成本也比ssd低一个数量级，从而大大降低了历史数据的存储成本。<br>快速了解hbase：我终于看懂了HBase，太不容易了…</p>
-<h2 id="3-3-离线部分架构"><a href="#3-3-离线部分架构" class="headerlink" title="3.3 离线部分架构"></a>3.3 离线部分架构</h2><p>主要是涉及后台管理相关，跳过不谈</p>
-</p></div></div><div class="post-footer"><div class="meta"><div class="info"><i class="fa fa-sun-o"></i><span class="date">2024-01-06</span><i class="fa fa-tag"></i><a class="tag" href="/tags/时序数据库TSDB/" title="时序数据库TSDB">时序数据库TSDB </a><span class="leancloud_visitors"></span><span>About 1738 words, 5 min 47 sec  read</span></div></div></div></div><div class="post animated fadeInDown"><div class="post-title"><h3><a href="/2023/10/30/nsq-Source-code-analysis/">NSQD源码解析：执行入口分析与核心功能解释</a></h3></div><div class="post-content"><div class="card"><p><h2 id="简介："><a href="#简介：" class="headerlink" title="简介："></a>简介：</h2><p>NSQD是NSQ消息队列系统的核心组件之一，负责接收、存储和分发消息。本篇博客将深入分析NSQD的执行入口，并解释其关键代码和核心功能，帮助读者更好地理解NSQD的工作原理。</p>
-<h2 id="正文："><a href="#正文：" class="headerlink" title="正文："></a>正文：</h2><p>NSQD的执行入口位于 main() 函数中。在 main() 函数中，我们可以看到以下关键步骤：</p>
-<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">type</span> program <span class="keyword">struct</span> &#123;</span><br><span class="line">	once sync.Once</span><br><span class="line">	nsqd *nsqd.NSQD</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">main</span><span class="params">()</span></span> &#123;</span><br><span class="line">	prg := &amp;program&#123;&#125;</span><br><span class="line">	<span class="keyword">if</span> err := svc.Run(prg, syscall.SIGINT, syscall.SIGTERM); err != <span class="literal">nil</span> &#123;</span><br><span class="line">		logFatal(<span class="string">&quot;%s&quot;</span>, err)</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="params">(p *program)</span></span> Init(env svc.Environment) <span class="type">error</span> &#123;</span><br><span class="line">	<span class="comment">// 设置默认值</span></span><br><span class="line">	opts := nsqd.NewOptions()</span><br><span class="line">	<span class="comment">// 命令行参数先设置默认值</span></span><br><span class="line">	flagSet := nsqdFlagSet(opts)</span><br><span class="line">	<span class="comment">// 解析命令行参数</span></span><br><span class="line">	flagSet.Parse(os.Args[<span class="number">1</span>:])</span><br><span class="line"></span><br><span class="line">	<span class="comment">// 使用时间作为随机种子值</span></span><br><span class="line">	rand.Seed(time.Now().UTC().UnixNano())</span><br><span class="line"></span><br><span class="line">	<span class="comment">// 启动命令 `nsqd -version` 用于打印版本号，并退出</span></span><br><span class="line">	<span class="keyword">if</span> flagSet.Lookup(<span class="string">&quot;version&quot;</span>).Value.(flag.Getter).Get().(<span class="type">bool</span>) &#123;</span><br><span class="line">		fmt.Println(version.String(<span class="string">&quot;nsqd&quot;</span>))</span><br><span class="line">		os.Exit(<span class="number">0</span>)</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	<span class="comment">// 读取配置文件</span></span><br><span class="line">	<span class="keyword">var</span> cfg config</span><br><span class="line">	configFile := flagSet.Lookup(<span class="string">&quot;config&quot;</span>).Value.String()</span><br><span class="line">	<span class="keyword">if</span> configFile != <span class="string">&quot;&quot;</span> &#123;</span><br><span class="line">		_, err := toml.DecodeFile(configFile, &amp;cfg)</span><br><span class="line">		<span class="keyword">if</span> err != <span class="literal">nil</span> &#123;</span><br><span class="line">			logFatal(<span class="string">&quot;failed to load config file %s - %s&quot;</span>, configFile, err)</span><br><span class="line">		&#125;</span><br><span class="line">	&#125;</span><br><span class="line">	cfg.Validate()</span><br><span class="line">	<span class="comment">// 将 flagSet 和 config 的配置信息合并到 opts</span></span><br><span class="line">	options.Resolve(opts, flagSet, cfg)</span><br><span class="line"></span><br><span class="line">	<span class="comment">// 创建 nsqd</span></span><br><span class="line">	nsqd, err := nsqd.New(opts)</span><br><span class="line">	<span class="keyword">if</span> err != <span class="literal">nil</span> &#123;</span><br><span class="line">		logFatal(<span class="string">&quot;failed to instantiate nsqd - %s&quot;</span>, err)</span><br><span class="line">	&#125;</span><br><span class="line">	p.nsqd = nsqd</span><br><span class="line"></span><br><span class="line">	<span class="keyword">return</span> <span class="literal">nil</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="params">(p *program)</span></span> Start() <span class="type">error</span> &#123;</span><br><span class="line">	<span class="comment">// 加载元数据</span></span><br><span class="line">	err := p.nsqd.LoadMetadata()</span><br><span class="line">	<span class="keyword">if</span> err != <span class="literal">nil</span> &#123;</span><br><span class="line">		logFatal(<span class="string">&quot;failed to load metadata - %s&quot;</span>, err)</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="comment">// 持久化元数据</span></span><br><span class="line">	err = p.nsqd.PersistMetadata()</span><br><span class="line">	<span class="keyword">if</span> err != <span class="literal">nil</span> &#123;</span><br><span class="line">		logFatal(<span class="string">&quot;failed to persist metadata - %s&quot;</span>, err)</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	<span class="keyword">go</span> <span class="function"><span class="keyword">func</span><span class="params">()</span></span> &#123;</span><br><span class="line">		<span class="comment">// 启动 nsqd</span></span><br><span class="line">		err := p.nsqd.Main()</span><br><span class="line">		<span class="keyword">if</span> err != <span class="literal">nil</span> &#123;</span><br><span class="line">			p.Stop()</span><br><span class="line">			os.Exit(<span class="number">1</span>)</span><br><span class="line">		&#125;</span><br><span class="line">	&#125;()</span><br><span class="line"></span><br><span class="line">	<span class="keyword">return</span> <span class="literal">nil</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="params">(p *program)</span></span> Stop() <span class="type">error</span> &#123;</span><br><span class="line">	<span class="comment">// once.Do() 只会执行一次</span></span><br><span class="line">	p.once.Do(<span class="function"><span class="keyword">func</span><span class="params">()</span></span> &#123;</span><br><span class="line">		p.nsqd.Exit()</span><br><span class="line">	&#125;)</span><br><span class="line">	<span class="keyword">return</span> <span class="literal">nil</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<ol>
-<li>初始化程序：<br>在程序的开头，我们创建了一个 program 结构体实例 prg :&#x3D; &amp;program{} 。这个结构体用于管理NSQD的生命周期，并实现了一些必要的接口方法。<br>接着，我们调用了 svc.Run(prg, syscall.SIGINT, syscall.SIGTERM) 来启动程序并监听系统的中断信号。</li>
-<li>初始化配置：<br>在 program 结构体的 Init(env svc.Environment) error 方法中，我们首先设置了默认配置值，并解析命令行参数。<br>为了方便用户使用，NSQD支持通过命令行参数来配置各种选项，例如端口号、日志级别等。<br>然后，我们通过读取配置文件并解析，将配置信息合并到 opts 结构体中。这样，NSQD就可以根据用户的配置进行相应的初始化操作。</li>
-<li>创建NSQD实例：<br>在 Init() 方法中，我们使用合并后的配置信息创建了NSQD实例 nsqd, err :&#x3D; nsqd.New(opts) 。<br>NSQD实例是整个NSQD服务的核心，它负责处理消息的接收、存储和分发等核心功能。如果创建实例失败，我们会打印错误日志并退出程序。</li>
-<li>启动NSQD：<br>在 Start() 方法中，我们首先加载元数据并持久化。元数据是NSQD存储消息和管理主题、通道等信息的关键数据。<br>加载元数据是为了恢复上次关闭时的状态，并确保数据的一致性。接着，我们调用 nsqd.Main() 方法启动NSQD的主要逻辑。<br>为了实现并发执行，我们使用了一个协程来异步执行 nsqd.Main() 方法。如果启动失败，我们会调用 p.Stop() 关闭相关资源，并退出程序。</li>
-<li>停止NSQD：<br>在 Stop() 方法中，我们通过 once.Do() 方法确保只执行一次。在这个方法内部，我们调用 nsqd.Exit() 方法来停止NSQD的运行。<br>这样可以保证在接收到停止信号时，NSQD能够正常退出，并释放占用的资源。</li>
-<li>处理信号：<br>Handle(s os.Signal) error 方法用于处理信号。在这里，我们返回了 svc.ErrStop ，表示停止程序运行。<br>这样，当接收到系统的中断信号时，NSQD会优雅地停止运行，并进行必要的清理工作。</li>
-<li>上下文管理：<br>Context() 方法返回一个上下文，当NSQD启动关闭时，该上下文将被取消。这样可以方便地管理NSQD的生命周期，并与其他组件进行协同工作。<br>总结：<br>本篇博客深入分析了NSQD的执行入口，并解释了其关键代码和核心功能。我们了解了NSQD的启动、停止、配置初始化以及信号处理等重要步骤。<br>通过这篇博客，读者可以更全面地了解NSQD的工作原理和核心功能，为深入研究NSQD源码打下坚实的基础。</li>
-</ol>
-</p></div></div><div class="post-footer"><div class="meta"><div class="info"><i class="fa fa-sun-o"></i><span class="date">2023-10-30</span><i class="fa fa-tag"></i><a class="tag" href="/tags/Golang/" title="Golang">Golang </a><span class="leancloud_visitors"></span><span>About 1228 words, 4 min 5 sec  read</span></div></div></div></div><div class="post animated fadeInDown"><div class="post-title"><h3><a href="/2023/09/08/mysql-sql%E4%BC%98%E5%8C%96/">SQL进阶使用技巧</a></h3></div><div class="post-content"><div class="card"><p><p>好文借鉴学习！！！<br><a target="_blank" rel="noopener" href="https://github.com/allentofight/easy-cs/blob/main/MySQL/SQL%E8%BF%9B%E9%98%B6%E4%BD%BF%E7%94%A8%E6%8A%80%E5%B7%A7.md?plain=1">https://github.com/allentofight/easy-cs/blob/main/MySQL/SQL%E8%BF%9B%E9%98%B6%E4%BD%BF%E7%94%A8%E6%8A%80%E5%B7%A7.md?plain=1</a><br>由于工作需要，最近做了很多 BI 取数的工作，需要用到一些比较高级的 SQL 技巧，总结了一下工作中用到的一些比较骚的进阶，特此记录一下，以方便自己查阅，主要目录如下：</p>
-<ul>
-<li>SQL 的书写规范</li>
-<li>SQL 的一些进阶使用技巧</li>
-<li>SQL 的优化方法</li>
-</ul>
-<h2 id="SQL-的书写规范"><a href="#SQL-的书写规范" class="headerlink" title="SQL 的书写规范"></a>SQL 的书写规范</h2><p>在介绍一些技巧之前，有必要强调一下规范，这一点我发现工作中经常被人忽略，其实遵循好的规范可读性会好很多，应该遵循哪些规范呢</p>
-<p>1、 表名要有意义，且标准 SQL 中规定表名的第一个字符应该是字母。</p>
-<p>2、注释，有单行注释和多行注释，如下</p>
-<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">-- 单行注释</span></span><br><span class="line"><span class="comment">-- 从SomeTable中查询col_1 </span></span><br><span class="line"><span class="keyword">SELECT</span> col_1</span><br><span class="line">  <span class="keyword">FROM</span> SomeTable;</span><br><span class="line"></span><br><span class="line"><span class="comment">/*</span></span><br><span class="line"><span class="comment">多行注释</span></span><br><span class="line"><span class="comment">从 SomeTable 中查询 col_1 </span></span><br><span class="line"><span class="comment">*/</span></span><br><span class="line"><span class="keyword">SELECT</span> col_1</span><br><span class="line">  <span class="keyword">FROM</span> SomeTable;</span><br></pre></td></tr></table></figure>
-<p>多行注释很多人不知道，这种写法不用可以用来添加真正的溈，也可以用来注释代码，非常方便</p>
-<p>3、缩进</p>
-<p>就像写 Java，Python 等编程语言一样 ，SQL 也应该有缩进，良好地缩进对提升代码的可读性帮助很大，以下分别是好的缩进与坏的缩进示例</p>
-<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">-- 好的缩进</span></span><br><span class="line"><span class="keyword">SELECT</span> col_1, </span><br><span class="line">       col_2, </span><br><span class="line">       col_3,</span><br><span class="line">       <span class="built_in">COUNT</span>(<span class="operator">*</span>) </span><br><span class="line">  <span class="keyword">FROM</span> tbl_A</span><br><span class="line"> <span class="keyword">WHERE</span> col_1 <span class="operator">=</span> <span class="string">&#x27;a&#x27;</span></span><br><span class="line">   <span class="keyword">AND</span> col_2 <span class="operator">=</span> ( <span class="keyword">SELECT</span> <span class="built_in">MAX</span>(col_2)</span><br><span class="line">                   <span class="keyword">FROM</span> tbl_B</span><br><span class="line">                  <span class="keyword">WHERE</span> col_3 <span class="operator">=</span> <span class="number">100</span> )</span><br><span class="line"> <span class="keyword">GROUP</span> <span class="keyword">BY</span> col_1,</span><br><span class="line">          col_2,</span><br><span class="line">          col_3</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="comment">-- 坏的示例</span></span><br><span class="line"><span class="keyword">SELECT</span> col1_1, col_2, col_3, <span class="built_in">COUNT</span>(<span class="operator">*</span>)</span><br><span class="line"><span class="keyword">FROM</span>   tbl_A</span><br><span class="line"><span class="keyword">WHERE</span>  col1_1 <span class="operator">=</span> <span class="string">&#x27;a&#x27;</span></span><br><span class="line"><span class="keyword">AND</span>    col1_2 <span class="operator">=</span> (</span><br><span class="line"><span class="keyword">SELECT</span> <span class="built_in">MAX</span>(col_2)</span><br><span class="line"><span class="keyword">FROM</span>   tbl_B</span><br><span class="line"><span class="keyword">WHERE</span>  col_3 <span class="operator">=</span> <span class="number">100</span></span><br><span class="line">) <span class="keyword">GROUP</span> <span class="keyword">BY</span> col_1, col_2, col_3</span><br></pre></td></tr></table></figure>
-
-<p>4、空格</p>
-<p>代码中应该适当留有一些空格，如果一点不留，代码都凑到一起， 逻辑单元不明确，阅读的人也会产生额外的压力，以下分别是是好的与坏的示例</p>
-<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line"><span class="comment">-- 好的示例</span></span><br><span class="line"><span class="keyword">SELECT</span> col_1</span><br><span class="line">  <span class="keyword">FROM</span> tbl_A A, tbl_B B</span><br><span class="line"> <span class="keyword">WHERE</span> ( A.col_1 <span class="operator">&gt;=</span> <span class="number">100</span> <span class="keyword">OR</span> A.col_2 <span class="keyword">IN</span> ( <span class="string">&#x27;a&#x27;</span>, <span class="string">&#x27;b&#x27;</span> ) )</span><br><span class="line">   <span class="keyword">AND</span> A.col_3 <span class="operator">=</span> B.col_3;</span><br><span class="line"></span><br><span class="line"><span class="comment">-- 坏的示例</span></span><br><span class="line"><span class="keyword">SELECT</span> col_1</span><br><span class="line">  <span class="keyword">FROM</span> tbl_A A,tbl_B B</span><br><span class="line"> <span class="keyword">WHERE</span> (A.col_1<span class="operator">&gt;=</span><span class="number">100</span> <span class="keyword">OR</span> A.col_2 <span class="keyword">IN</span> (<span class="string">&#x27;a&#x27;</span>,<span class="string">&#x27;b&#x27;</span>))</span><br><span class="line">   <span class="keyword">AND</span> A.col_3<span class="operator">=</span>B.col_3;</span><br></pre></td></tr></table></figure>
+<!DOCTYPE html>
 
 
-<p>4、大小写</p>
-<p>关键字使用大小写，表名列名使用小写，如下</p>
-<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">SELECT</span> col_1, col_2, col_3,</span><br><span class="line">       <span class="built_in">COUNT</span>(<span class="operator">*</span>)</span><br><span class="line">  <span class="keyword">FROM</span> tbl_A</span><br><span class="line"> <span class="keyword">WHERE</span> col_1 <span class="operator">=</span> <span class="string">&#x27;a&#x27;</span></span><br><span class="line">   <span class="keyword">AND</span> col_2 <span class="operator">=</span> ( <span class="keyword">SELECT</span> <span class="built_in">MAX</span>(col_2)</span><br><span class="line">                   <span class="keyword">FROM</span> tbl_B</span><br><span class="line">                  <span class="keyword">WHERE</span> col_3 <span class="operator">=</span> <span class="number">100</span> )</span><br><span class="line"> <span class="keyword">GROUP</span> <span class="keyword">BY</span> col_1, col_2, col_3</span><br></pre></td></tr></table></figure>
+<html theme="dark" showBanner="true" hasBanner="false" > 
+<link href="https://cdn.staticfile.org/font-awesome/6.4.2/css/fontawesome.min.css" rel="stylesheet">
+<link href="https://cdn.staticfile.org/font-awesome/6.4.2/css/brands.min.css" rel="stylesheet">
+<link href="https://cdn.staticfile.org/font-awesome/6.4.2/css/solid.min.css" rel="stylesheet">
+<script src="/js/color.global.min.js" ></script>
+<script src="/js/load-settings.js" ></script>
+<head>
+  <meta charset="utf-8">
+  
+  
+  
 
-<p>花了这么多时间强调规范，有必要吗，有！好的规范让代码的可读性更好，更有利于团队合作，之后的 SQL 示例都会遵循这些规范。</p>
-<h2 id="SQL-的一些进阶使用技巧"><a href="#SQL-的一些进阶使用技巧" class="headerlink" title="SQL 的一些进阶使用技巧"></a>SQL 的一些进阶使用技巧</h2><p><strong>一、巧用 CASE WHEN 进行统计</strong></p>
-<p>来看看如何巧用 CASE WHEN 进行定制化统计,假设我们有如下的需求，希望根据左边各个市的人口统计每个省的人口</p>
-<p><img src="https://user-gold-cdn.xitu.io/2020/5/8/171f45f26bc2542d?w=818&h=283&f=png&s=30366"></p>
-<p>使用 CASE WHEN 如下</p>
-<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">SELECT</span> <span class="keyword">CASE</span> pref_name</span><br><span class="line">               <span class="keyword">WHEN</span> <span class="string">&#x27;长沙&#x27;</span> <span class="keyword">THEN</span> <span class="string">&#x27;湖南&#x27;</span> </span><br><span class="line">               <span class="keyword">WHEN</span> <span class="string">&#x27;衡阳&#x27;</span> <span class="keyword">THEN</span> <span class="string">&#x27;湖南&#x27;</span></span><br><span class="line">               <span class="keyword">WHEN</span> <span class="string">&#x27;海口&#x27;</span> <span class="keyword">THEN</span> <span class="string">&#x27;海南&#x27;</span> </span><br><span class="line">               <span class="keyword">WHEN</span> <span class="string">&#x27;三亚&#x27;</span> <span class="keyword">THEN</span> <span class="string">&#x27;海南&#x27;</span></span><br><span class="line">       <span class="keyword">ELSE</span> <span class="string">&#x27;其他&#x27;</span> <span class="keyword">END</span> <span class="keyword">AS</span> district,</span><br><span class="line">       <span class="built_in">SUM</span>(population) </span><br><span class="line"><span class="keyword">FROM</span> PopTbl</span><br><span class="line"><span class="keyword">GROUP</span> <span class="keyword">BY</span> district;</span><br></pre></td></tr></table></figure>
+  
+  <title>陈sir爱狂扁</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 
-<p><strong>二、巧用 CASE WHEN 进行更新</strong></p>
-<p>现在某公司员人工资信息表如下:</p>
-<p><img src="https://user-gold-cdn.xitu.io/2020/5/8/171f45f271f4a96f?w=318&h=280&f=png&s=16778"></p>
-<p>现在公司出台了一个奇葩的规定</p>
-<ol>
-<li>对当前工资为 1 万以上的员工，降薪 10%。</li>
-<li>对当前工资低于 1 万的员工，加薪 20%。</li>
-</ol>
-<p>一些人不假思索可能写出了以下的 SQL:</p>
-<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">--条件1</span></span><br><span class="line"><span class="keyword">UPDATE</span> Salaries</span><br><span class="line"><span class="keyword">SET</span> salary <span class="operator">=</span> salary <span class="operator">*</span> <span class="number">0.9</span> <span class="keyword">WHERE</span> salary <span class="operator">&gt;=</span> <span class="number">10000</span>;</span><br><span class="line"><span class="comment">--条件2</span></span><br><span class="line"><span class="keyword">UPDATE</span> Salaries</span><br><span class="line"><span class="keyword">SET</span> salary <span class="operator">=</span> salary <span class="operator">*</span> <span class="number">1.2</span></span><br><span class="line"><span class="keyword">WHERE</span> salary <span class="operator">&lt;</span> <span class="number">10000</span>;</span><br></pre></td></tr></table></figure>
-<p>这么做其实是有问题的， 什么问题，对小明来说，他的工资是 10500，执行第一个 SQL 后，工资变为 10500 * 0.9 &#x3D; 9450, 紧接着又执行条件 2， 工资变为了 9450 * 1.2 &#x3D; 11340，反而涨薪了！</p>
-<p>如果用 CASE WHEN 可以解决此类问题，如下：</p>
-<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">UPDATE</span> Salaries</span><br><span class="line"><span class="keyword">SET</span> salary <span class="operator">=</span> <span class="keyword">CASE</span> <span class="keyword">WHEN</span> salary <span class="operator">&gt;=</span> <span class="number">10000</span> <span class="keyword">THEN</span> salary <span class="operator">*</span> <span class="number">0.9</span></span><br><span class="line"><span class="keyword">WHEN</span> salary <span class="operator">&lt;</span> <span class="number">280000</span> <span class="keyword">THEN</span> salary <span class="operator">*</span> <span class="number">1.2</span></span><br><span class="line"><span class="keyword">ELSE</span> salary <span class="keyword">END</span>;</span><br></pre></td></tr></table></figure>
+  <link rel="preload" href="/css/fonts/Roboto-Regular.ttf" as="font" type="font/ttf" crossorigin="anonymous">
+  <link rel="preload" href="/css/fonts/Roboto-Bold.ttf" as="font" type="font/ttf" crossorigin="anonymous">
 
-<p><strong>三、巧用 HAVING 子句</strong></p>
-<p>一般 HAVING 是与 GROUP BY 结合使用的，但其实它是可以独立使用的，<br>假设有如下表，第一列 seq 叫连续编号，但其实有些编号是缺失的，怎么知道编号是否缺失呢，</p>
-<p><img src="https://user-gold-cdn.xitu.io/2020/5/8/171f45f26ba5842c?w=419&h=216&f=png&s=17670"></p>
-<p>用 HAVING 表示如下:</p>
-<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">SELECT</span> <span class="string">&#x27;存在缺失的编号&#x27;</span> <span class="keyword">AS</span> gap</span><br><span class="line">  <span class="keyword">FROM</span> SeqTbl</span><br><span class="line"><span class="keyword">HAVING</span> <span class="built_in">COUNT</span>(<span class="operator">*</span>) <span class="operator">&lt;&gt;</span> <span class="built_in">MAX</span>(seq);</span><br></pre></td></tr></table></figure>
+  <meta property="og:type" content="website">
+<meta property="og:title" content="陈sir爱狂扁">
+<meta property="og:url" content="https://cheny-alf.github.io/index.html">
+<meta property="og:site_name" content="陈sir爱狂扁">
+<meta property="og:locale" content="en_US">
+<meta property="article:author" content="John Doe">
+<meta name="twitter:card" content="summary">
+  
+    <link rel="alternate" href="/atom.xml" title="陈sir爱狂扁" type="application/atom+xml">
+  
+  
+    <link rel="icon" media="(prefers-color-scheme: light)" href="/images/favicon-light-32.png" sizes="32x32">
+    <link rel="icon" media="(prefers-color-scheme: light)" href="/images/favicon-light-128.png" sizes="128x128">
+    <link rel="icon" media="(prefers-color-scheme: light)" href="/images/favicon-light-180.png" sizes="180x180">
+    <link rel="icon" media="(prefers-color-scheme: light)" href="/images/favicon-light-192.png" sizes="192x192">
+    <link rel="icon" media="(prefers-color-scheme: dark)" href="/images/favicon-dark-32.png" sizes="32x32">
+    <link rel="icon" media="(prefers-color-scheme: dark)" href="/images/favicon-dark-128.png" sizes="128x128">
+    <link rel="icon" media="(prefers-color-scheme: dark)" href="/images/favicon-dark-180.png" sizes="180x180">
+    <link rel="icon" media="(prefers-color-scheme: dark)" href="/images/favicon-dark-192.png" sizes="192x192">
+  
+  
+  
+<link rel="stylesheet" href="/css/style.css">
 
-<p><strong>四、自连接</strong></p>
-<p>针对相同的表进行的连接被称为“自连接”(self join)，这个技巧常常被人们忽视，其实是有挺多妙用的</p>
-<p>1、删除重复行</p>
-<p><img src="https://user-gold-cdn.xitu.io/2020/5/8/171f45f28a9ee43e?w=419&h=273&f=png&s=27006"></p>
-<p>上图中有三个橘子，需要把这些重复的行给删掉，用如下自连接可以解决：</p>
-<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">DELETE</span> <span class="keyword">FROM</span> Products P1</span><br><span class="line"> <span class="keyword">WHERE</span> id <span class="operator">&lt;</span> ( <span class="keyword">SELECT</span> <span class="built_in">MAX</span>(P2.id) </span><br><span class="line">                   <span class="keyword">FROM</span> Products P2 </span><br><span class="line">                  <span class="keyword">WHERE</span> P1.name <span class="operator">=</span> P2.name </span><br><span class="line">                    <span class="keyword">AND</span> P1.price <span class="operator">=</span> P2.price ); </span><br></pre></td></tr></table></figure>
+<meta name="generator" content="Hexo 6.3.0"></head>
 
-<p>2、排序</p>
-<p>在 db 中，我们经常需要按分数，人数，销售额等进行排名，有 Oracle, DB2 中可以使用 RANK 函数进行排名，不过在 MySQL 中 RANK 函数未实现，这种情况我们可以使用自连接来实现,如对以下 Products 表按价格高低进行排名</p>
-<p><img src="https://user-gold-cdn.xitu.io/2020/5/8/171f45f1ebcb9b3c?w=366&h=175&f=png&s=17002"></p>
-<p>使用自连接可以这么写:</p>
-<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">-- 排序从 1 开始。如果已出现相同位次，则跳过之后的位次 </span></span><br><span class="line"><span class="keyword">SELECT</span> P1.name,</span><br><span class="line">       P1.price,</span><br><span class="line">       (<span class="keyword">SELECT</span> <span class="built_in">COUNT</span>(P2.price)</span><br><span class="line">          <span class="keyword">FROM</span> Products P2</span><br><span class="line">         <span class="keyword">WHERE</span> P2.price <span class="operator">&gt;</span> P1.price) <span class="operator">+</span> <span class="number">1</span> <span class="keyword">AS</span> rank_1</span><br><span class="line">  <span class="keyword">FROM</span> Products P1 </span><br><span class="line">  <span class="keyword">ORDER</span> <span class="keyword">BY</span> rank_1;</span><br></pre></td></tr></table></figure>
+<body>
+  
+   
+  <div id="main-grid" class="  ">
+    <div id="nav" class=" is_home "  >
+      <navbar id="navbar">
+  <nav id="title-nav">
+    <a href="/">
+      <div id="vivia-logo">
+        <div class="dot"></div>
+        <div class="dot"></div>
+        <div class="dot"></div>
+        <div class="dot"></div>
+      </div>
+      <div>陈sir爱狂扁 </div>
+    </a>
+  </nav>
+  <nav id="main-nav">
+    
+      <a class="main-nav-link" href="/">Home</a>
+    
+      <a class="main-nav-link" href="/archives">Archives</a>
+    
+      <a class="main-nav-link" href="/about">About</a>
+    
+  </nav>
+  <nav id="sub-nav">
+    <a id="theme-btn" class="nav-icon">
+      <span class="light-mode-icon"><svg xmlns="http://www.w3.org/2000/svg" height="20" viewBox="0 -960 960 960" width="20"><path d="M438.5-829.913v-48q0-17.452 11.963-29.476 11.964-12.024 29.326-12.024 17.363 0 29.537 12.024t12.174 29.476v48q0 17.452-11.963 29.476-11.964 12.024-29.326 12.024-17.363 0-29.537-12.024T438.5-829.913Zm0 747.826v-48q0-17.452 11.963-29.476 11.964-12.024 29.326-12.024 17.363 0 29.537 12.024t12.174 29.476v48q0 17.452-11.963 29.476-11.964 12.024-29.326 12.024-17.363 0-29.537-12.024T438.5-82.087ZM877.913-438.5h-48q-17.452 0-29.476-11.963-12.024-11.964-12.024-29.326 0-17.363 12.024-29.537t29.476-12.174h48q17.452 0 29.476 11.963 12.024 11.964 12.024 29.326 0 17.363-12.024 29.537T877.913-438.5Zm-747.826 0h-48q-17.452 0-29.476-11.963-12.024-11.964-12.024-29.326 0-17.363 12.024-29.537T82.087-521.5h48q17.452 0 29.476 11.963 12.024 11.964 12.024 29.326 0 17.363-12.024 29.537T130.087-438.5Zm660.174-290.87-34.239 32q-12.913 12.674-29.565 12.174-16.653-.5-29.327-13.174-12.674-12.673-12.554-28.826.12-16.152 12.794-28.826l33-35q12.913-12.674 30.454-12.674t30.163 12.847q12.709 12.846 12.328 30.826-.38 17.98-13.054 30.653ZM262.63-203.978l-32 34q-12.913 12.674-30.454 12.674t-30.163-12.847q-12.709-12.846-12.328-30.826.38-17.98 13.054-30.653l33.239-31q12.913-12.674 29.565-12.174 16.653.5 29.327 13.174 12.674 12.673 12.554 28.826-.12 16.152-12.794 28.826Zm466.74 33.239-32-33.239q-12.674-12.913-12.174-29.565.5-16.653 13.174-29.327 12.673-12.674 28.826-13.054 16.152-.38 28.826 12.294l35 33q12.674 12.913 12.674 30.454t-12.847 30.163q-12.846 12.709-30.826 12.328-17.98-.38-30.653-13.054ZM203.978-697.37l-34-33q-12.674-12.913-13.174-29.945-.5-17.033 12.174-29.707t31.326-13.293q18.653-.62 31.326 13.054l32 34.239q11.674 12.913 11.174 29.565-.5 16.653-13.174 29.327-12.673 12.674-28.826 12.554-16.152-.12-28.826-12.794ZM480-240q-100 0-170-70t-70-170q0-100 70-170t170-70q100 0 170 70t70 170q0 100-70 170t-170 70Zm-.247-82q65.703 0 111.475-46.272Q637-414.544 637-480.247t-45.525-111.228Q545.95-637 480.247-637t-111.475 45.525Q323-545.95 323-480.247t45.525 111.975Q414.05-322 479.753-322ZM481-481Z"/></svg></span>
+      <span class="dark-mode-icon"><svg xmlns="http://www.w3.org/2000/svg" height="20" viewBox="0 -960 960 960" width="20"><path d="M480.239-116.413q-152.63 0-258.228-105.478Q116.413-327.37 116.413-480q0-130.935 77.739-227.435t206.304-125.043q43.022-9.631 63.87 10.869t3.478 62.805q-8.891 22.043-14.315 44.463-5.424 22.42-5.424 46.689 0 91.694 64.326 155.879 64.325 64.186 156.218 64.186 24.369 0 46.978-4.946 22.609-4.945 44.413-14.076 42.826-17.369 62.967 1.142 20.142 18.511 10.511 61.054Q807.174-280 712.63-198.206q-94.543 81.793-232.391 81.793Zm0-95q79.783 0 143.337-40.217 63.554-40.218 95.793-108.283-15.608 4.044-31.097 5.326-15.49 1.283-31.859.805-123.706-4.066-210.777-90.539-87.071-86.473-91.614-212.092-.24-16.369.923-31.978 1.164-15.609 5.446-30.978-67.826 32.478-108.282 96.152Q211.652-559.543 211.652-480q0 111.929 78.329 190.258 78.329 78.329 190.258 78.329ZM466.13-465.891Z"/></svg></span>
+    </a>
+    
+      <a id="nav-rss-link" class="nav-icon mobile-hide" href="/atom.xml" title="RSS Feed">
+        <svg xmlns="http://www.w3.org/2000/svg" height="20" viewBox="0 -960 960 960" width="20"><path d="M198-120q-25.846 0-44.23-18.384-18.384-18.385-18.384-44.23 0-25.846 18.384-44.23 18.384-18.385 44.23-18.385 25.846 0 44.23 18.385 18.384 18.384 18.384 44.23 0 25.845-18.384 44.23Q223.846-120 198-120Zm538.385 0q-18.846 0-32.923-13.769-14.076-13.769-15.922-33.23-8.692-100.616-51.077-188.654-42.385-88.039-109.885-155.539-67.5-67.501-155.539-109.885Q283-663.462 182.385-672.154q-19.461-1.846-33.23-16.23-13.769-14.385-13.769-33.846t14.076-32.922q14.077-13.461 32.923-12.23 120.076 8.692 226.038 58.768 105.961 50.077 185.73 129.846 79.769 79.769 129.846 185.731 50.077 105.961 58.769 226.038 1.231 18.846-12.538 32.922Q756.461-120 736.385-120Zm-252 0q-18.231 0-32.423-13.461t-18.653-33.538Q418.155-264.23 348.886-333.5q-69.27-69.27-166.501-84.423-20.077-4.462-33.538-18.961-13.461-14.5-13.461-33.346 0-19.076 13.884-33.23 13.884-14.153 33.115-10.922 136.769 15.384 234.384 112.999 97.615 97.615 112.999 234.384 3.231 19.23-10.538 33.115Q505.461-120 484.385-120Z"/></svg>
+      </a>
+    
+    <div id="nav-menu-btn" class="nav-icon">
+      <svg xmlns="http://www.w3.org/2000/svg" height="20" viewBox="0 -960 960 960" width="20"><path d="M177.37-252.282q-17.453 0-29.477-11.964-12.024-11.963-12.024-29.326t12.024-29.537q12.024-12.174 29.477-12.174h605.26q17.453 0 29.477 11.964 12.024 11.963 12.024 29.326t-12.024 29.537q-12.024 12.174-29.477 12.174H177.37Zm0-186.218q-17.453 0-29.477-11.963-12.024-11.964-12.024-29.326 0-17.363 12.024-29.537T177.37-521.5h605.26q17.453 0 29.477 11.963 12.024 11.964 12.024 29.326 0 17.363-12.024 29.537T782.63-438.5H177.37Zm0-186.217q-17.453 0-29.477-11.964-12.024-11.963-12.024-29.326t12.024-29.537q12.024-12.174 29.477-12.174h605.26q17.453 0 29.477 11.964 12.024 11.963 12.024 29.326t-12.024 29.537q-12.024 12.174-29.477 12.174H177.37Z"/></svg>
+    </div>
+  </nav>
+</navbar>
+<div id="nav-dropdown" class="hidden">
+  <div id="dropdown-link-list">
+    
+      <a class="nav-dropdown-link" href="/">Home</a>
+    
+      <a class="nav-dropdown-link" href="/archives">Archives</a>
+    
+      <a class="nav-dropdown-link" href="/about">About</a>
+    
+    
+      <a class="nav-dropdown-link" href="/atom.xml" title="RSS Feed">RSS</a>
+     
+    </div>
+</div>
+<script>
+  let dropdownBtn = document.getElementById("nav-menu-btn");
+  let dropdownEle = document.getElementById("nav-dropdown");
+  dropdownBtn.onclick = function() {
+    dropdownEle.classList.toggle("hidden");
+  }
+</script>
+    </div>
+    <div id="sidebar-wrapper">
+      <sidebar id="sidebar">
+  
+    <div class="widget-wrap">
+  <div class="info-card">
+    <div class="avatar">
+      
+      <div class="img-dim"></div>
+    </div>
+    <div class="info">
+      <div class="username">Your Name </div>
+      <div class="dot"></div>
+      <div class="subtitle">This is the subtitle </div>
+      <div class="link-list">
+        
+          <a class="link-btn" target="_blank" rel="noopener" href="https://twitter.com" title="Twitter"><i class="fa-brands fa-twitter"></i></a>
+        
+          <a class="link-btn" target="_blank" rel="noopener" href="https://store.steampowered.com" title="Steam"><i class="fa-brands fa-steam"></i></a>
+        
+          <a class="link-btn" target="_blank" rel="noopener" href="https://github.com" title="GitHub"><i class="fa-brands fa-github"></i></a>
+         
+      </div>  
+    </div>
+  </div>
+</div>
 
-<p>结果如下:</p>
-<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">name price rank </span><br><span class="line"><span class="comment">----- ------ ------ </span></span><br><span class="line">橘子    <span class="number">100</span>     <span class="number">1</span> </span><br><span class="line">西瓜     <span class="number">80</span>     <span class="number">2</span> </span><br><span class="line">苹果     <span class="number">50</span>     <span class="number">3</span> </span><br><span class="line">葡萄     <span class="number">50</span>     <span class="number">3</span> </span><br><span class="line">香蕉     <span class="number">50</span>     <span class="number">3</span> </span><br><span class="line">柠檬     <span class="number">30</span>     <span class="number">6</span></span><br></pre></td></tr></table></figure>
-
-<p><strong>五、巧用 COALESCE 函数</strong></p>
-<p>此函数作用返回参数中的第一个非空表达式，假设有如下商品，我们重新格式化一样，如果 city 为 null，代表商品不在此城市发行，但我们在展示结果的时候不想展示 null，而想展示 ‘N&#x2F;A’, 可以这么做:</p>
-<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">SELECT</span> </span><br><span class="line">    <span class="built_in">COALESCE</span>(city, <span class="string">&#x27;N/A&#x27;</span>)</span><br><span class="line">  <span class="keyword">FROM</span></span><br><span class="line">    customers;</span><br></pre></td></tr></table></figure>
-
-<p><img src="https://user-gold-cdn.xitu.io/2020/5/8/171f45f23af2ffa4?w=319&h=281&f=png&s=12891"></p>
-<h2 id="SQL-性能优化技巧"><a href="#SQL-性能优化技巧" class="headerlink" title="SQL 性能优化技巧"></a>SQL 性能优化技巧</h2><p><strong>一、参数是子查询时，使用 EXISTS 代替 IN</strong></p>
-<p>如果 IN 的参数是（1，2，3）这样的值列表时，没啥问题，但如果参数是子查询时，就需要注意了。比如，现在有如下两个表：</p>
-<p><img src="https://user-gold-cdn.xitu.io/2020/5/8/171f45f332825699?w=1406&h=584&f=png&s=47266"></p>
-<p>现在我们要查出同时存在于两个表的员工，即小明和小东，则以下用 IN 和 EXISTS 返回的结果是一样，但是用 EXISTS 的 SQL 会更快:</p>
-<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line"><span class="comment">-- 慢</span></span><br><span class="line"><span class="keyword">SELECT</span> <span class="operator">*</span> </span><br><span class="line">  <span class="keyword">FROM</span> Class_A</span><br><span class="line"><span class="keyword">WHERE</span> id <span class="keyword">IN</span> (<span class="keyword">SELECT</span> id </span><br><span class="line">               <span class="keyword">FROM</span>  CLASS_B);</span><br><span class="line"></span><br><span class="line"><span class="comment">-- 快</span></span><br><span class="line"><span class="keyword">SELECT</span> <span class="operator">*</span></span><br><span class="line">  <span class="keyword">FROM</span> Class_A A </span><br><span class="line"> <span class="keyword">WHERE</span> <span class="keyword">EXISTS</span></span><br><span class="line">(<span class="keyword">SELECT</span> <span class="operator">*</span> </span><br><span class="line">   <span class="keyword">FROM</span> Class_B  B</span><br><span class="line">  <span class="keyword">WHERE</span> A.id <span class="operator">=</span> B.id);</span><br></pre></td></tr></table></figure>
-
-<p>为啥使用 EXISTS 的 SQL 运行更快呢，有两个原因</p>
-<ol>
-<li>可以&#96;用到索引，如果连接列 (id) 上建立了索引，那么查询 Class_B 时不用查实际的表，只需查索引就可以了。</li>
-<li>如果使用 EXISTS，那么只要查到一行数据满足条件就会终止查询， 不用像使用 IN 时一样扫描全表。在这一点上 NOT EXISTS 也一样</li>
-</ol>
-<p>另外如果 IN 后面如果跟着的是子查询，由于 SQL 会先执行 IN 后面的子查询，会将子查询的结果保存在一张临时的工作表里（内联视图），然后扫描<strong>整个视图</strong>，显然扫描整个视图这个工作很多时候是非常耗时的，而用 EXISTS 不会生成临时表。</p>
-<p>当然了，如果 IN 的参数是子查询时，也可以用连接来代替，如下：</p>
-<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">-- 使用连接代替 IN SELECT A.id, A.name</span></span><br><span class="line"><span class="keyword">FROM</span> Class_A A <span class="keyword">INNER</span> <span class="keyword">JOIN</span> Class_B B <span class="keyword">ON</span> A.id <span class="operator">=</span> B.id;</span><br></pre></td></tr></table></figure>
-<p>用到了 「id」列上的索引，而且由于没有子查询，也不会生成临时表</p>
-<p><strong>二、避免排序</strong></p>
-<p>SQL 是声明式语言，即对用户来说，只关心它能做什么，不用关心它怎么做。这样可能会产生潜在的性能问题：排序，会产生排序的代表性运算有下面这些</p>
-<ul>
-<li>GROUP BY 子句</li>
-<li>ORDER BY 子句</li>
-<li>聚合函数(SUM、COUNT、AVG、MAX、MIN)</li>
-<li>DISTINCT</li>
-<li>集合运算符(UNION、INTERSECT、EXCEPT)</li>
-<li>窗口函数(RANK、ROW_NUMBER 等)</li>
-</ul>
-<p>如果在内存中排序还好，但如果内存不够导致需要在硬盘上排序上的话，性能就会急剧下降，所以我们需要减少不必要的排序。怎样做可以减少排序呢。</p>
-<p>1、 使用集合运算符的 ALL 可选项</p>
-<p>SQL 中有 UNION，INTERSECT，EXCEPT 三个集合运算符，默认情况下，这些运算符会为了避免重复数据而进行排序，对比一下使用 UNION 运算符加和不加 ALL 的情况:</p>
-<p><img src="https://user-gold-cdn.xitu.io/2020/5/8/171f45f341f95fba?w=974&h=539&f=png&s=49965"></p>
-<p>注意：加 ALL 是优化性能非常有效的手段，不过前提是不在乎结果是否有重复数据。</p>
-<p>2、使用 EXISTS 代表 DISTINCT</p>
-<p>为了排除重复数据， DISTINCT 也会对结果进行排序，如果需要对两张表的连接结果进行去重，可以考虑用 EXISTS 代替 DISTINCT，这样可以避免排序。</p>
-<p><img src="https://user-gold-cdn.xitu.io/2020/5/8/171f45f36457dfd3?w=818&h=283&f=png&s=36930"></p>
-<p>如何找出有销售记录的商品，使用如下 DISTINCT 可以：</p>
-<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">SELECT</span> <span class="keyword">DISTINCT</span> I.item_no</span><br><span class="line"><span class="keyword">FROM</span> Items I <span class="keyword">INNER</span> <span class="keyword">JOIN</span> SalesHistory SH</span><br><span class="line"><span class="keyword">ON</span> I. item_no <span class="operator">=</span> SH. item_no;</span><br></pre></td></tr></table></figure>
-
-<p>不过更好的方式是使用 EXISTS:</p>
-<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">SELECT</span> item_no <span class="keyword">FROM</span> Items I</span><br><span class="line"><span class="keyword">WHERE</span> <span class="keyword">EXISTS</span> </span><br><span class="line">        (<span class="keyword">SELECT</span> <span class="operator">*</span></span><br><span class="line">           <span class="keyword">FROM</span> SalesHistory SH</span><br><span class="line">          <span class="keyword">WHERE</span> I.item_no <span class="operator">=</span> SH.item_no);</span><br></pre></td></tr></table></figure>
-
-<p>既用到了索引，又避免了排序对性能的损耗。</p>
-<p><strong>二、在极值函数中使用索引（MAX&#x2F;MIN）</strong></p>
-<p>使用 MAX&#x2F; MIN 都会对进行排序，如果参数字段上没加索引会导致全表扫描，如果建有索引，则只需要扫描索引即可，对比如下</p>
-<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">-- 这样写需要扫描全表 </span></span><br><span class="line"><span class="keyword">SELECT</span> <span class="built_in">MAX</span>(item)</span><br><span class="line">  <span class="keyword">FROM</span> Items;</span><br><span class="line"></span><br><span class="line"><span class="comment">-- 这样写能用到索引 </span></span><br><span class="line"><span class="keyword">SELECT</span> <span class="built_in">MAX</span>(item_no)</span><br><span class="line">  <span class="keyword">FROM</span> Items;</span><br></pre></td></tr></table></figure>
-
-<p>注意：极值函数参数推荐为索引列中并不是不需要排序，而是优化了排序前的查找速度（毕竟索引本身就是有序排列的）。</p>
-<p><strong>三、能写在 WHERE 子句里的条件不要写在 HAVING 子句里</strong></p>
-<p>下列 SQL 语句返回的结果是一样的:</p>
-<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">-- 聚合后使用 HAVING 子句过滤</span></span><br><span class="line"><span class="keyword">SELECT</span> sale_date, <span class="built_in">SUM</span>(quantity)</span><br><span class="line">  <span class="keyword">FROM</span> SalesHistory <span class="keyword">GROUP</span> <span class="keyword">BY</span> sale_date</span><br><span class="line"><span class="keyword">HAVING</span> sale_date <span class="operator">=</span> <span class="string">&#x27;2007-10-01&#x27;</span>;</span><br><span class="line"></span><br><span class="line"><span class="comment">-- 聚合前使用 WHERE 子句过滤</span></span><br><span class="line"><span class="keyword">SELECT</span> sale_date, <span class="built_in">SUM</span>(quantity)</span><br><span class="line">  <span class="keyword">FROM</span> SalesHistory</span><br><span class="line"> <span class="keyword">WHERE</span> sale_date <span class="operator">=</span> <span class="string">&#x27;2007-10-01&#x27;</span> </span><br><span class="line"> <span class="keyword">GROUP</span> <span class="keyword">BY</span> sale_date;</span><br></pre></td></tr></table></figure>
-
-<p>使用第二条语句效率更高，原因主要有两点</p>
-<ol>
-<li>使用 GROUP BY 子句进行聚合时会进行排序，如果事先通过 WHERE 子句能筛选出一部分行，能减轻排序的钢制</li>
-<li>在 WHERE 子句中可以使用索引，而 HAVING 子句是针对聚合后生成的视频进行筛选的，但很多时候聚合后生成的视图并没有保留原表的索引结构</li>
-</ol>
-<p><strong>四、在 GROUP BY 子句和 ORDER BY 子句中使用索引</strong></p>
-<p>GROUP BY 子句和 ORDER BY 子句一般都会进行排序，以对行进行排列和替换，不过如果指定带有索引的列作为这两者的参数列，由于用到了索引，可以实现高速查询，由于索引是有序的，排序本身都会被省略掉</p>
-<p><strong>五、使用索引时，条件表达式的左侧应该是原始字段</strong></p>
-<p>假设我们在 col 列上建立了索引，则下面这些 SQL 语句无法用到索引</p>
-<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">SELECT</span> <span class="operator">*</span></span><br><span class="line">  <span class="keyword">FROM</span> SomeTable</span><br><span class="line"> <span class="keyword">WHERE</span> col <span class="operator">*</span> <span class="number">1.1</span> <span class="operator">&gt;</span> <span class="number">100</span>;</span><br><span class="line"></span><br><span class="line"><span class="keyword">SELECT</span> <span class="operator">*</span></span><br><span class="line">  <span class="keyword">FROM</span> SomeTable</span><br><span class="line"> <span class="keyword">WHERE</span> SUBSTR(col, <span class="number">1</span>, <span class="number">1</span>) <span class="operator">=</span> <span class="string">&#x27;a&#x27;</span>;</span><br></pre></td></tr></table></figure>
-
-<p>以上第一个 SQL 在索引列上进行了运算, 第二个 SQL 对索引列使用了函数，均无法用到索引，正确方式是把列单独放在左侧,如下:</p>
-<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">SELECT</span> <span class="operator">*</span></span><br><span class="line">  <span class="keyword">FROM</span> SomeTable</span><br><span class="line"> <span class="keyword">WHERE</span> col_1 <span class="operator">&gt;</span> <span class="number">100</span> <span class="operator">/</span> <span class="number">1.1</span>;</span><br></pre></td></tr></table></figure>
+  
+  <div class="sticky">
+    
+      
 
 
-<p>当然如果需要对此列使用函数，则无法避免在左侧运算，可以考虑使用函数索引，不过一般不推荐随意这么做。</p>
-<p><strong>六、尽量避免使用否定形式</strong></p>
-<p>如下的几种否定形式不能用到索引：</p>
-<ul>
-<li>&lt;&gt;</li>
-<li>!&#x3D;</li>
-<li>NOT IN</li>
-</ul>
-<p>所以以下 了SQL 语句会导致全表扫描</p>
-<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">SELECT</span> <span class="operator">*</span></span><br><span class="line">  <span class="keyword">FROM</span> SomeTable</span><br><span class="line"> <span class="keyword">WHERE</span> col_1 <span class="operator">&lt;&gt;</span> <span class="number">100</span>;</span><br></pre></td></tr></table></figure>
+  <div class="widget-wrap">
+    <div class="widget">
+      <h3 class="widget-title">Categories</h3>
+      <div class="category-box">
+            <a class="category-link" href="/categories/Golang/">
+                Golang
+                <div class="category-count">7</div>
+            </a>
+        
+            <a class="category-link" href="/categories/%E5%BB%B6%E8%BF%9F%E9%98%9F%E5%88%97/">
+                延迟队列
+                <div class="category-count">1</div>
+            </a>
+        <div class="children"><div class="category-box">
+            <a class="category-link" href="/categories/%E5%BB%B6%E8%BF%9F%E9%98%9F%E5%88%97/Redis/">
+                Redis
+                <div class="category-count">1</div>
+            </a>
+        <div class="children"><div class="category-box">
+            <a class="category-link" href="/categories/%E5%BB%B6%E8%BF%9F%E9%98%9F%E5%88%97/Redis/Golang/">
+                Golang
+                <div class="category-count">1</div>
+            </a>
+        </div></div></div></div>
+            <a class="category-link" href="/categories/Kafka/">
+                Kafka
+                <div class="category-count">1</div>
+            </a>
+        
+            <a class="category-link" href="/categories/Redis/">
+                Redis
+                <div class="category-count">2</div>
+            </a>
+        </div>
+    </div>
+  </div>
 
-<p>可以改成以下形式</p>
-<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">SELECT</span> <span class="operator">*</span></span><br><span class="line">  <span class="keyword">FROM</span> SomeTable</span><br><span class="line"> <span class="keyword">WHERE</span> col_1 <span class="operator">&gt;</span> <span class="number">100</span> <span class="keyword">or</span> col_1 <span class="operator">&lt;</span> <span class="number">100</span>;</span><br></pre></td></tr></table></figure>
 
-<p><strong>七、进行默认的类型转换</strong></p>
-<p>假设 col 是 char 类型，则推荐使用以下第二，三条 SQL 的写法，不推荐第一条 SQL 的写法</p>
-<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">× <span class="keyword">SELECT</span> <span class="operator">*</span> <span class="keyword">FROM</span> SomeTable <span class="keyword">WHERE</span> col_1 <span class="operator">=</span> <span class="number">10</span>;</span><br><span class="line">○ <span class="keyword">SELECT</span> <span class="operator">*</span> <span class="keyword">FROM</span> SomeTable <span class="keyword">WHERE</span> col_1 <span class="operator">=</span> <span class="string">&#x27;10&#x27;</span>;</span><br><span class="line">○ <span class="keyword">SELECT</span> <span class="operator">*</span> <span class="keyword">FROM</span> SomeTable <span class="keyword">WHERE</span> col_1 <span class="operator">=</span> <span class="built_in">CAST</span>(<span class="number">10</span>, <span class="keyword">AS</span> <span class="type">CHAR</span>(<span class="number">2</span>));</span><br></pre></td></tr></table></figure>
+    
+      
+  <div class="widget-wrap">
+    <div class="widget">
+      <h3 class="widget-title">Tags</h3>
+      <ul class="widget-tag-list" itemprop="keywords"><li class="widget-tag-list-item"><a class="widget-tag-list-link" href="/tags/Golang/" rel="tag">Golang</a></li><li class="widget-tag-list-item"><a class="widget-tag-list-link" href="/tags/Kafka/" rel="tag">Kafka</a></li><li class="widget-tag-list-item"><a class="widget-tag-list-link" href="/tags/Redis/" rel="tag">Redis</a></li><li class="widget-tag-list-item"><a class="widget-tag-list-link" href="/tags/golang/" rel="tag">golang</a></li><li class="widget-tag-list-item"><a class="widget-tag-list-link" href="/tags/mysql/" rel="tag">mysql</a></li><li class="widget-tag-list-item"><a class="widget-tag-list-link" href="/tags/redis/" rel="tag">redis</a></li><li class="widget-tag-list-item"><a class="widget-tag-list-link" href="/tags/%E5%BB%B6%E8%BF%9F%E9%98%9F%E5%88%97/" rel="tag">延迟队列</a></li><li class="widget-tag-list-item"><a class="widget-tag-list-link" href="/tags/%E6%97%B6%E5%BA%8F%E6%95%B0%E6%8D%AE%E5%BA%93TSDB/" rel="tag">时序数据库TSDB</a></li><li class="widget-tag-list-item"><a class="widget-tag-list-link" href="/tags/%E7%9F%A5%E8%AF%86%E7%82%B9/" rel="tag">知识点</a></li><li class="widget-tag-list-item"><a class="widget-tag-list-link" href="/tags/%E9%99%90%E6%B5%81/" rel="tag">限流</a></li><li class="widget-tag-list-item"><a class="widget-tag-list-link" href="/tags/%E9%9D%A2%E8%AF%95/" rel="tag">面试</a></li></ul>
+    </div>
+  </div>
 
-<p>虽然第一条 SQL 会默认把 10 转成 ‘10’，但这种默认类型转换不仅会增加额外的性能开销，开会导致索引不可用，所以建议使用的时候地进行类型转换。</p>
-<p><strong>八、减少中间表</strong></p>
-<p>在 SQL 中，子查询的结果会产生一张新表，不过如果不加限制大量使用中间表的话，会带来两个问题，一是展示数据需要消耗内存资源，二是原始表中的索引不容易用到，所以尽量减少中间表也可以提升性能。</p>
-<p><strong>九、灵活使用 HAVING 子句</strong></p>
-<p>这一点与上面第八条相呼应，对聚合结果指定筛选条件时，使用 HAVING 是基本的原则，可能一些工程师会倾向于使用下面这样的写法:</p>
-<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">SELECT</span> <span class="operator">*</span></span><br><span class="line">  <span class="keyword">FROM</span> (<span class="keyword">SELECT</span> sale_date, <span class="built_in">MAX</span>(quantity) <span class="keyword">AS</span> max_qty</span><br><span class="line">          <span class="keyword">FROM</span> SalesHistory </span><br><span class="line">         <span class="keyword">GROUP</span> <span class="keyword">BY</span> sale_date) TMP</span><br><span class="line"><span class="keyword">WHERE</span> max_qty <span class="operator">&gt;=</span> <span class="number">10</span>;</span><br></pre></td></tr></table></figure>
-<p>虽然上面这样的写法能达到目的，但会生成 TMP 这张临时表，所以应该使用下面这样的写法:</p>
-<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">SELECT</span> sale_date, <span class="built_in">MAX</span>(quantity) </span><br><span class="line">  <span class="keyword">FROM</span> SalesHistory</span><br><span class="line"> <span class="keyword">GROUP</span> <span class="keyword">BY</span> sale_date</span><br><span class="line"><span class="keyword">HAVING</span> <span class="built_in">MAX</span>(quantity) <span class="operator">&gt;=</span> <span class="number">10</span>;</span><br></pre></td></tr></table></figure>
 
-<p>HAVING 子句和聚合操作是同时执行的，所以比起生成中间表后再执行 HAVING 子句，效率会更高，代码也更简洁</p>
-<p><strong>10、需要对多个字段使用 IN 谓词时，将它们汇总到一处</strong></p>
-<p>一个表的多个字段可能都使用了 IN 谓词，如下:</p>
-<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">SELECT</span> id, state, city </span><br><span class="line">  <span class="keyword">FROM</span> Addresses1 A1</span><br><span class="line"> <span class="keyword">WHERE</span> state <span class="keyword">IN</span> (<span class="keyword">SELECT</span> state</span><br><span class="line">                   <span class="keyword">FROM</span> Addresses2 A2</span><br><span class="line">                  <span class="keyword">WHERE</span> A1.id <span class="operator">=</span> A2.id) </span><br><span class="line">    <span class="keyword">AND</span> city <span class="keyword">IN</span> (<span class="keyword">SELECT</span> city</span><br><span class="line">                   <span class="keyword">FROM</span> Addresses2 A2 </span><br><span class="line">                  <span class="keyword">WHERE</span> A1.id <span class="operator">=</span> A2.id);</span><br></pre></td></tr></table></figure>
+    
+  </div>
+</sidebar>
+    </div>
+    <div id="content-body">
+      
+   
 
-<p>这段代码用到了两个子查询，也就产生了两个中间表，可以像下面这样写</p>
-<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">SELECT</span> <span class="operator">*</span></span><br><span class="line">  <span class="keyword">FROM</span> Addresses1 A1</span><br><span class="line"> <span class="keyword">WHERE</span> id <span class="operator">||</span> state <span class="operator">||</span> city</span><br><span class="line">    <span class="keyword">IN</span> (<span class="keyword">SELECT</span> id <span class="operator">||</span> state<span class="operator">||</span> city</span><br><span class="line">          <span class="keyword">FROM</span> Addresses2 A2);</span><br></pre></td></tr></table></figure>
 
-<p>这样子查询不用考虑关联性，没有中间表产生，而且只执行一次即可。</p>
-<h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><p>本文一开始花了挺大的篇幅来讲解 SQL 的规范，请大家务必重视这部分内部，良好地规范有利于团队协作，对于代码的阅读也比较友好。</p>
-<p>之后介绍了一些 SQL 的比较高级的用法，巧用这些技巧确实能达到事半功倍的效果，由于本文篇幅有限只是介绍了一部分，下篇我们会再介绍一些其他的技巧，敬请期待哦</p>
-<p><strong>巨人的肩膀</strong></p>
-<ul>
-<li>&lt;&lt;SQL 进阶教程&gt;&gt;</li>
-</ul>
-<p>欢迎大家关注公号，共同进步！</p>
-<p><img src="https://user-gold-cdn.xitu.io/2020/5/8/171f3cdebc558d86?w=430&h=430&f=jpeg&s=41396"></p>
-</p></div></div><div class="post-footer"><div class="meta"><div class="info"><i class="fa fa-sun-o"></i><span class="date">2023-09-08</span><i class="fa fa-tag"></i><a class="tag" href="/tags/mysql/" title="mysql">mysql </a><span class="leancloud_visitors"></span><span>About 3834 words, 12 min 46 sec  read</span></div></div></div></div><div class="post animated fadeInDown"><div class="post-title"><h3><a href="/2023/09/07/sub-table/">分库分表--概览</a></h3></div><div class="post-content"><div class="card"><p><p>今天，我们来瞎掰扯掰扯Mysql分库分表相关内容～</p>
-<h3 id="什么是分库分表"><a href="#什么是分库分表" class="headerlink" title="什么是分库分表"></a>什么是分库分表</h3><h4 id="分表"><a href="#分表" class="headerlink" title="分表"></a>分表</h4><p>比如我们的单表数据量已经达到几千万了，单表数据量这么大，会极大的影响sql的执行性能。单表数据量在几百万的时候，性能就会相对差一点，就应该考虑分表了。</p>
-<p>分表是什么意思呢？就是将一个表的数据放到多个表中，然后查询的时候就查询一个表。比如按照UserID来进行分表，将一个用户的数据存放在一个表中，然后操作这个用户的时候就操作一个表就好了。这样可以控制每个表的数据量在200w左右</p>
-<h4 id="分库"><a href="#分库" class="headerlink" title="分库"></a>分库</h4><p>mysql单库最多支持2000的并发，当并发达到这个值的时候就必须要扩容了，而且一个健康的单库并发应该在1000左右，不要太大。可以将一个库的数据拆分到多个库中，访问的时候就访问一个库好了。</p>
-<h3 id="如何去对数据库做拆分？水平拆分还是垂直拆分"><a href="#如何去对数据库做拆分？水平拆分还是垂直拆分" class="headerlink" title="如何去对数据库做拆分？水平拆分还是垂直拆分"></a>如何去对数据库做拆分？水平拆分还是垂直拆分</h3><p><strong>水平拆分</strong>就是把一个表的数据给弄到多个库的多个表里去，但是每个表的表结构都是一样的，不过每个表里数据是不相同的，所有库表的数据加起来就是全部的数据。<strong>水平拆分的意义</strong>在于将数据均匀放在更多的库表，然后用更多的库表来抗并发，同时也保证每个表的数据量不会太多，影响查询效率。</p>
-<p><strong>垂直拆分</strong>就是把一个有很多字段的表给拆分成多个表，或者是多个库上去，每个表的表结构都不一样，每个库表都包含一部分的字段。一般来说，会将较少的访问频率较高的字段放到一个表里去，然后将较多的访问频率较低的字段存放到另一个表里去。</p>
-<h3 id="在项目中该如何去做拆分？"><a href="#在项目中该如何去做拆分？" class="headerlink" title="在项目中该如何去做拆分？"></a>在项目中该如何去做拆分？</h3><p>在项目中，一般来说垂直拆分，你可以在表层面来做，对一些字段特别多的表做一下拆分；水平拆分，你可以说是并发承载不了，或者是数据量太大，容量承载不了，去按照某个字段做水平拆分。<br><strong>分库分表方式</strong>：按照某个字段 hash 一下均匀分散，这个较为常用。好处在于说，可以平均分配每个库的数据量和请求压力；</p>
-<h3 id="我们如何去做迁移？如何无损的迁移？（迁移全流程）"><a href="#我们如何去做迁移？如何无损的迁移？（迁移全流程）" class="headerlink" title="我们如何去做迁移？如何无损的迁移？（迁移全流程）"></a>我们如何去做迁移？如何无损的迁移？（迁移全流程）</h3><ol>
-<li>首先，我们保持原有的单写，写到旧的数据库中，然后先通过脚本把一些静态的数据（就是哪些不需要修改的数据）进行迁移，迁移完了之后去验证数据的准确性。</li>
-<li>配置新的数据库，然后开启双写，还是旧的数据库提供读，然后再去迁移哪些动态数据，迁移完了之后验证动态数据的准确性</li>
-<li>最后我们在切换数据源，切换到新的数据库，验证是否有问题，有问题就切会旧的</li>
-<li>关闭双写 迁移完成。</li>
-</ol>
-<h3 id="分库分表之后，主键ID怎么处理？"><a href="#分库分表之后，主键ID怎么处理？" class="headerlink" title="分库分表之后，主键ID怎么处理？"></a>分库分表之后，主键ID怎么处理？</h3><p>分布式ID：<a target="_blank" rel="noopener" href="https://cloud.tencent.com/developer/article/2149830">https://cloud.tencent.com/developer/article/2149830</a></p>
-</p></div></div><div class="post-footer"><div class="meta"><div class="info"><i class="fa fa-sun-o"></i><span class="date">2023-09-07</span><i class="fa fa-tag"></i><a class="tag" href="/tags/mysql/" title="mysql">mysql </a><span class="leancloud_visitors"></span><span>About 929 words, 3 min 5 sec  read</span></div></div></div></div><div class="post animated fadeInDown"><div class="post-title"><h3><a href="/2023/09/02/mysql-read-write/">mysql-read-write</a></h3></div><div class="post-content"><div class="card"><p></p></div></div><div class="post-footer"><div class="meta"><div class="info"><i class="fa fa-sun-o"></i><span class="date">2023-09-02</span><span class="leancloud_visitors"></span><span>About 0 words, 0 sec  read</span></div></div></div></div><div class="post animated fadeInDown"><div class="post-title"><h3><a href="/2023/09/02/master-slave/">mysql主从复制</a></h3></div><div class="post-content"><div class="card"><p><p><strong>瞎扯时间到！！！</strong></p>
-<h3 id="什么是主从复制？"><a href="#什么是主从复制？" class="headerlink" title="什么是主从复制？"></a>什么是主从复制？</h3><p>主从复制是指将主库到表结构、表数据也就是DDL和DML操作通过<strong>binlog</strong>日志传输到从库中去，然后在从库中对这些日志从新执行(重做),从而使的从库和主库数据保持同步。</p>
-<p>mysql支持一台主库向多台从库进行复制，从库也可以作为主库像其他的从库同步数据，形成链式复制。</p>
-<h3 id="为什么需要主从复制"><a href="#为什么需要主从复制" class="headerlink" title="为什么需要主从复制"></a>为什么需要主从复制</h3><ol>
-<li>主库出现问题，可以快速切换到从库，提供服务</li>
-<li>实现读写分离，降低主库的访问压力。写操作全都在主库上执行，读操作都在从库上执行</li>
-<li>可以在从库进行备份操作，以避免备份期间影响主库服务（备份期间会加一个全局锁，整个数据库就会是只读的，无法进行增删改操作。会把整个库锁住）</li>
-</ol>
-<h3 id="原理"><a href="#原理" class="headerlink" title="原理"></a>原理</h3><ol>
-<li>master主库在事务提交的时候，会把数据变更记录在二进制日志文件binlog中</li>
-<li>从库有个IOThread线程读取主库的二进制日志文件binlog，写入到从库的中继日志RelayLog里。</li>
-<li>slave重做中继日志RelayLog中的事件，将改变反映在自己的数据中<br><img src="/../images/master-slave.png" alt="img.png"></li>
-</ol>
-</p></div></div><div class="post-footer"><div class="meta"><div class="info"><i class="fa fa-sun-o"></i><span class="date">2023-09-02</span><i class="fa fa-tag"></i><a class="tag" href="/tags/mysql/" title="mysql">mysql </a><span class="leancloud_visitors"></span><span>About 359 words, 1 min 11 sec  read</span></div></div></div></div><div class="post animated fadeInDown"><div class="post-title"><h3><a href="/2023/09/01/aksk/">AK/SK简述</a></h3></div><div class="post-content"><div class="card"><p><h3 id="什么是AK-SK"><a href="#什么是AK-SK" class="headerlink" title="什么是AK&#x2F;SK"></a>什么是AK&#x2F;SK</h3><p>ak&#x2F;sk是一种身份认证方式，常用于系统间接口调用时的身份验证，其中ak为Access Key ID，sk为Secret Access Key。客户端和服务端两者会协商保存一份相同的sk，其中sk必须保密。</p>
-<h3 id="AK-SK认证的流程"><a href="#AK-SK认证的流程" class="headerlink" title="AK&#x2F;SK认证的流程"></a>AK&#x2F;SK认证的流程</h3><p>假设我们目前有这么个情景：我们（开发人员）需要向合作方提供一个接口，然后我们需要保证这个接口返回的数据是加密的，避免被人拦截。</p>
-<p>首先，我们提供给合作方ak-作为身份标识，sk-作为对请求数据的加密密钥。然后合作方在调用我们的接口的时候，传入ak作为身份标识，然后将其他的参数，用sk加密，这里我们以<code>AES对称加密</code>举例,然后我们收到他们的请求后，拿到ak，去数据库里查询对应的合作方信息，如果没有则说明身份不对，如果查询到里信息，则认证通过，然后拿到对应的sk去对加密内容进行解密、处理业务流程、返回数据（同样采用刚刚的sk进行加密）。</p>
-<p><img src="/../images/aksk.png" alt="img_1.png"></p>
-</p></div></div><div class="post-footer"><div class="meta"><div class="info"><i class="fa fa-sun-o"></i><span class="date">2023-09-01</span><i class="fa fa-tag"></i><a class="tag" href="/tags/知识点/" title="知识点">知识点 </a><span class="leancloud_visitors"></span><span>About 343 words, 1 min 8 sec  read</span></div></div></div></div><div class="pagination"><ul class="clearfix"><li class="next pagbuttons"><a class="btn" role="navigation" href="/page/2/">Next</a></li></ul></div></div></div></div><script src="/js/darkLightToggle.js"></script><script src="/js/jquery-migrate-1.2.1.min.js"></script><script src="/js/jquery.appear.js"></script><script src="/js/add-bookmark.js"></script><script>(function(window){var INSIGHT_CONFIG={TRANSLATION:{POSTS:"Posts",PAGES:"Pages",CATEGORIES:"Categories",TAGS:"Tags",UNTITLED:"(Untitled)",},CONTENT_URL:"/content.json",};window.INSIGHT_CONFIG=INSIGHT_CONFIG})(window);</script><script src="/js/insight.js" defer></script><div class="searchbox ins-search"><div class="searchbox-container ins-search-container"><div class="searchbox-input-wrapper"><input class="searchbox-input ins-search-input" type="text" placeholder="Search..."><span class="searchbox-close"><a class="fa fa-times-circle" onclick="closeWindow();"></a></span></div><div class="searchbox-result-wrapper ins-section-wrapper"><div class="ins-section-container"><p>Seraching...</p></div></div></div></div></body></html>
+<article id="post-《深入剖析k8s》笔记-1-容器技术基础" class="h-entry article article-type-post" itemprop="blogPost" itemscope itemtype="https://schema.org/BlogPosting">
+   
+  <div class="article-inner">
+    <div class="article-main">
+      <header class="article-header">
+        
+<div class="main-title-bar">
+  <div class="main-title-dot"></div>
+  
+    
+      <h1 itemprop="name">
+        <a class="p-name article-title" href="/2024/04/24/%E3%80%8A%E6%B7%B1%E5%85%A5%E5%89%96%E6%9E%90k8s%E3%80%8B%E7%AC%94%E8%AE%B0-1-%E5%AE%B9%E5%99%A8%E6%8A%80%E6%9C%AF%E5%9F%BA%E7%A1%80/">《深入剖析k8s》笔记--(1)容器技术基础</a>
+      </h1>
+    
+  
+</div>
+
+        <div class='meta-info-bar'>
+          <div class="meta-info">
+  <time class="dt-published" datetime="2024-04-24T02:04:26.000Z" itemprop="datePublished">2024-04-24</time>
+</div>
+          <div class="need-seperator meta-info">
+            <div class="meta-cate-flex">
+  
+    Uncategorized 
+   
+</div>
+  
+          </div>
+          <div class="wordcount need-seperator meta-info">
+             words 
+          </div>
+        </div>
+        
+      </header>
+      <div class="e-content article-entry" itemprop="articleBody">
+        
+          <div class="truncate-text">
+            
+              最近在学习k8s，主要是阅读《深入剖析Kubernetes》这本书籍，同时也会跟着这本书去实践。
+
+            
+          </div>
+        
+      </div>
+
+         
+    </div>
+    
+     
+    <a class="right-panel  non-pic  "
+      
+      href="/2024/04/24/%E3%80%8A%E6%B7%B1%E5%85%A5%E5%89%96%E6%9E%90k8s%E3%80%8B%E7%AC%94%E8%AE%B0-1-%E5%AE%B9%E5%99%A8%E6%8A%80%E6%9C%AF%E5%9F%BA%E7%A1%80/" 
+    >
+       
+      <i class="fa-solid fa-angle-right non-pic"></i>
+       
+    </a>
+     
+  </div>
+  
+</article>
+
+
+
+
+
+
+
+   
+
+
+<article id="post-《深入剖析k8s》-4-k8s集群搭建" class="h-entry article article-type-post" itemprop="blogPost" itemscope itemtype="https://schema.org/BlogPosting">
+   
+  <div class="article-inner">
+    <div class="article-main">
+      <header class="article-header">
+        
+<div class="main-title-bar">
+  <div class="main-title-dot"></div>
+  
+    
+      <h1 itemprop="name">
+        <a class="p-name article-title" href="/2024/04/24/%E3%80%8A%E6%B7%B1%E5%85%A5%E5%89%96%E6%9E%90k8s%E3%80%8B-4-k8s%E9%9B%86%E7%BE%A4%E6%90%AD%E5%BB%BA/">《深入剖析k8s》--(4)k8s集群搭建</a>
+      </h1>
+    
+  
+</div>
+
+        <div class='meta-info-bar'>
+          <div class="meta-info">
+  <time class="dt-published" datetime="2024-04-24T02:01:56.000Z" itemprop="datePublished">2024-04-24</time>
+</div>
+          <div class="need-seperator meta-info">
+            <div class="meta-cate-flex">
+  
+    Uncategorized 
+   
+</div>
+  
+          </div>
+          <div class="wordcount need-seperator meta-info">
+             words 
+          </div>
+        </div>
+        
+      </header>
+      <div class="e-content article-entry" itemprop="articleBody">
+        
+          <div class="truncate-text">
+            
+              接下来，我们将按照书中的步骤，我们直接采用4.2小节从0到1：搭建一个完成的Kubernetes集群
+
+安装docker我们已经提前安装好docker了，跳过docker
+安装kubeadm1234567sudo apt-get updatesudo apt-get install -y apt-transport-httpscurl -fsSL https://packages.cloud.google.com/apt/doc/apt-key.gpg | sudo gpg --dearmor -o /etc/apt/keyrings/kubernetes-archive-keyring.gpgecho &quot;deb [signed-by=/etc/apt/keyrings/kubernetes-archive-keyring.gpg] https://apt.kubernetes.io/ kubernetes-xenial main&quot; | sudo tee /etc/apt/sources.list.d/kubernetes.listsudo apt-get u...
+            
+          </div>
+        
+      </div>
+
+         
+    </div>
+    
+     
+    <a class="right-panel  non-pic  "
+      
+      href="/2024/04/24/%E3%80%8A%E6%B7%B1%E5%85%A5%E5%89%96%E6%9E%90k8s%E3%80%8B-4-k8s%E9%9B%86%E7%BE%A4%E6%90%AD%E5%BB%BA/" 
+    >
+       
+      <i class="fa-solid fa-angle-right non-pic"></i>
+       
+    </a>
+     
+  </div>
+  
+</article>
+
+
+
+
+
+
+
+   
+
+
+<article id="post-optimization" class="h-entry article article-type-post" itemprop="blogPost" itemscope itemtype="https://schema.org/BlogPosting">
+   
+  <div class="article-inner">
+    <div class="article-main">
+      <header class="article-header">
+        
+<div class="main-title-bar">
+  <div class="main-title-dot"></div>
+  
+    
+      <h1 itemprop="name">
+        <a class="p-name article-title" href="/2024/03/06/optimization/">记录一次接口优化过程</a>
+      </h1>
+    
+  
+</div>
+
+        <div class='meta-info-bar'>
+          <div class="meta-info">
+  <time class="dt-published" datetime="2024-03-06T11:51:57.000Z" itemprop="datePublished">2024-03-06</time>
+</div>
+          <div class="need-seperator meta-info">
+            <div class="meta-cate-flex">
+  
+    Uncategorized 
+   
+</div>
+  
+          </div>
+          <div class="wordcount need-seperator meta-info">
+             words 
+          </div>
+        </div>
+        
+  <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/mysql/" rel="tag">mysql</a></li></ul>
+
+      </header>
+      <div class="e-content article-entry" itemprop="articleBody">
+        
+          <div class="truncate-text">
+            
+              一、背景一个接口执行的业务逻辑是返回区区域范围内所有停车场的热度值用于热力图渲染，发现这个接口响应时间普通在2.4s左右，影响前端热力图加载速度
+二、业务逻辑这个接口中共有3个数据查询操作获取区域信息：获取城市下各街道区域信息，全表数据量级19条， 本业务涉及10条,因数据量比较少，所以忽略此sql查询对耗时影响
+
+            
+          </div>
+        
+      </div>
+
+         
+    </div>
+    
+     
+    <a class="right-panel  non-pic  "
+      
+      href="/2024/03/06/optimization/" 
+    >
+       
+      <i class="fa-solid fa-angle-right non-pic"></i>
+       
+    </a>
+     
+  </div>
+  
+</article>
+
+
+
+
+
+
+
+   
+
+
+<article id="post-tsdb" class="h-entry article article-type-post" itemprop="blogPost" itemscope itemtype="https://schema.org/BlogPosting">
+   
+  <div class="article-inner">
+    <div class="article-main">
+      <header class="article-header">
+        
+<div class="main-title-bar">
+  <div class="main-title-dot"></div>
+  
+    
+      <h1 itemprop="name">
+        <a class="p-name article-title" href="/2024/01/06/tsdb/">时序数据库中的聚合计算：加速洞察与优化性能(上)</a>
+      </h1>
+    
+  
+</div>
+
+        <div class='meta-info-bar'>
+          <div class="meta-info">
+  <time class="dt-published" datetime="2024-01-06T06:51:28.000Z" itemprop="datePublished">2024-01-06</time>
+</div>
+          <div class="need-seperator meta-info">
+            <div class="meta-cate-flex">
+  
+    Uncategorized 
+   
+</div>
+  
+          </div>
+          <div class="wordcount need-seperator meta-info">
+             words 
+          </div>
+        </div>
+        
+  <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/%E6%97%B6%E5%BA%8F%E6%95%B0%E6%8D%AE%E5%BA%93TSDB/" rel="tag">时序数据库TSDB</a></li></ul>
+
+      </header>
+      <div class="e-content article-entry" itemprop="articleBody">
+        
+          <div class="truncate-text">
+            
+              1. 引言在当今数据驱动的世界中，时序数据库（TSDB）已成为处理和分析时间序列数据的关键工具。随着物联网（IoT）设备的激增和实时数据流的爆炸性增长，对高效处理和分析这些数据的需求日益迫切。聚合计算，作为TSDB的一个核心功能，为用户在海量时序数据中快速提取有价值信息提供了可能。
+2. 名词解释TSDB: Time Series Database，时序数据库，用于保存时间序列（按时间顺序变化）的海量数据。metric: 度量，如发动机的温度、转速等。metric相当于关系型数据库中的table。timestamp: 时间戳，格林威治时间1970年01月01日00时00分00秒(北京时间1970年01月01日08时00分00秒)起至现在的总毫秒数。field: 度量下的不同字段，譬如位置这个度量下可以有经度和纬度两个字段。每个字段有相应的数值，如56°C、1000r&#x2F;s等（实际中不带单位）。tag: 标签，或附加属性，一个tag是一个key-value对，用于提供额外的信息，如“型号&#x3D;ABC123”、“出厂编号&#x3D;1234567890”等。row: 数...
+            
+          </div>
+        
+      </div>
+
+         
+    </div>
+    
+     
+    <a class="right-panel  non-pic  "
+      
+      href="/2024/01/06/tsdb/" 
+    >
+       
+      <i class="fa-solid fa-angle-right non-pic"></i>
+       
+    </a>
+     
+  </div>
+  
+</article>
+
+
+
+
+
+
+
+   
+
+
+<article id="post-nsq-Source-code-analysis" class="h-entry article article-type-post" itemprop="blogPost" itemscope itemtype="https://schema.org/BlogPosting">
+   
+  <div class="article-inner">
+    <div class="article-main">
+      <header class="article-header">
+        
+<div class="main-title-bar">
+  <div class="main-title-dot"></div>
+  
+    
+      <h1 itemprop="name">
+        <a class="p-name article-title" href="/2023/10/30/nsq-Source-code-analysis/">NSQD源码解析：执行入口分析与核心功能解释</a>
+      </h1>
+    
+  
+</div>
+
+        <div class='meta-info-bar'>
+          <div class="meta-info">
+  <time class="dt-published" datetime="2023-10-30T05:47:51.000Z" itemprop="datePublished">2023-10-30</time>
+</div>
+          <div class="need-seperator meta-info">
+            <div class="meta-cate-flex">
+  
+    Uncategorized 
+   
+</div>
+  
+          </div>
+          <div class="wordcount need-seperator meta-info">
+             words 
+          </div>
+        </div>
+        
+  <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Golang/" rel="tag">Golang</a></li></ul>
+
+      </header>
+      <div class="e-content article-entry" itemprop="articleBody">
+        
+          <div class="truncate-text">
+            
+              简介：NSQD是NSQ消息队列系统的核心组件之一，负责接收、存储和分发消息。本篇博客将深入分析NSQD的执行入口，并解释其关键代码和核心功能，帮助读者更好地理解NSQD的工作原理。
+正文：NSQD的执行入口位于 main() 函数中。在 main() 函数中，我们可以看到以下关键步骤：
+1234567891011121314151617181920212223242526272829303132333435363738394041424344454647484950515253545556575859606162636465666768697071727374757677787980818283type program struct &#123;	once sync.Once	nsqd *nsqd.NSQD&#125;func main() &#123;	prg := &amp;program&#123;&#125;	if err := svc.Run(prg, syscall.SIGINT, syscall.SIGTERM); err != nil &#123;		logFat...
+            
+          </div>
+        
+      </div>
+
+         
+    </div>
+    
+     
+    <a class="right-panel  non-pic  "
+      
+      href="/2023/10/30/nsq-Source-code-analysis/" 
+    >
+       
+      <i class="fa-solid fa-angle-right non-pic"></i>
+       
+    </a>
+     
+  </div>
+  
+</article>
+
+
+
+
+
+
+
+   
+
+
+<article id="post-mysql-sql优化" class="h-entry article article-type-post" itemprop="blogPost" itemscope itemtype="https://schema.org/BlogPosting">
+   
+  <div class="article-inner">
+    <div class="article-main">
+      <header class="article-header">
+        
+<div class="main-title-bar">
+  <div class="main-title-dot"></div>
+  
+    
+      <h1 itemprop="name">
+        <a class="p-name article-title" href="/2023/09/08/mysql-sql%E4%BC%98%E5%8C%96/">SQL进阶使用技巧</a>
+      </h1>
+    
+  
+</div>
+
+        <div class='meta-info-bar'>
+          <div class="meta-info">
+  <time class="dt-published" datetime="2023-09-08T05:50:35.000Z" itemprop="datePublished">2023-09-08</time>
+</div>
+          <div class="need-seperator meta-info">
+            <div class="meta-cate-flex">
+  
+    Uncategorized 
+   
+</div>
+  
+          </div>
+          <div class="wordcount need-seperator meta-info">
+             words 
+          </div>
+        </div>
+        
+  <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/mysql/" rel="tag">mysql</a></li></ul>
+
+      </header>
+      <div class="e-content article-entry" itemprop="articleBody">
+        
+          <div class="truncate-text">
+            
+              好文借鉴学习！！！https://github.com/allentofight/easy-cs/blob/main/MySQL/SQL%E8%BF%9B%E9%98%B6%E4%BD%BF%E7%94%A8%E6%8A%80%E5%B7%A7.md?plain=1由于工作需要，最近做了很多 BI 取数的工作，需要用到一些比较高级的 SQL 技巧，总结了一下工作中用到的一些比较骚的进阶，特此记录一下，以方便自己查阅，主要目录如下：
+
+SQL 的书写规范
+SQL 的一些进阶使用技巧
+SQL 的优化方法
+
+SQL 的书写规范在介绍一些技巧之前，有必要强调一下规范，这一点我发现工作中经常被人忽略，其实遵循好的规范可读性会好很多，应该遵循哪些规范呢
+1、 表名要有意义，且标准 SQL 中规定表名的第一个字符应该是字母。
+2、注释，有单行注释和多行注释，如下
+1234567891011-- 单行注释-- 从SomeTable中查询col_1 SELECT col_1  FROM SomeTable;/*多行注释从 SomeTable 中查询 col_1 */SELECT col_1  FR...
+            
+          </div>
+        
+      </div>
+
+         
+    </div>
+    
+     
+    <a class="right-panel  non-pic  "
+      
+      href="/2023/09/08/mysql-sql%E4%BC%98%E5%8C%96/" 
+    >
+       
+      <i class="fa-solid fa-angle-right non-pic"></i>
+       
+    </a>
+     
+  </div>
+  
+</article>
+
+
+
+
+
+
+
+   
+
+
+<article id="post-sub-table" class="h-entry article article-type-post" itemprop="blogPost" itemscope itemtype="https://schema.org/BlogPosting">
+   
+  <div class="article-inner">
+    <div class="article-main">
+      <header class="article-header">
+        
+<div class="main-title-bar">
+  <div class="main-title-dot"></div>
+  
+    
+      <h1 itemprop="name">
+        <a class="p-name article-title" href="/2023/09/07/sub-table/">分库分表--概览</a>
+      </h1>
+    
+  
+</div>
+
+        <div class='meta-info-bar'>
+          <div class="meta-info">
+  <time class="dt-published" datetime="2023-09-07T11:21:08.000Z" itemprop="datePublished">2023-09-07</time>
+</div>
+          <div class="need-seperator meta-info">
+            <div class="meta-cate-flex">
+  
+    Uncategorized 
+   
+</div>
+  
+          </div>
+          <div class="wordcount need-seperator meta-info">
+             words 
+          </div>
+        </div>
+        
+  <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/mysql/" rel="tag">mysql</a></li></ul>
+
+      </header>
+      <div class="e-content article-entry" itemprop="articleBody">
+        
+          <div class="truncate-text">
+            
+              今天，我们来瞎掰扯掰扯Mysql分库分表相关内容～
+什么是分库分表分表比如我们的单表数据量已经达到几千万了，单表数据量这么大，会极大的影响sql的执行性能。单表数据量在几百万的时候，性能就会相对差一点，就应该考虑分表了。
+分表是什么意思呢？就是将一个表的数据放到多个表中，然后查询的时候就查询一个表。比如按照UserID来进行分表，将一个用户的数据存放在一个表中，然后操作这个用户的时候就操作一个表就好了。这样可以控制每个表的数据量在200w左右
+分库mysql单库最多支持2000的并发，当并发达到这个值的时候就必须要扩容了，而且一个健康的单库并发应该在1000左右，不要太大。可以将一个库的数据拆分到多个库中，访问的时候就访问一个库好了。
+如何去对数据库做拆分？水平拆分还是垂直拆分水平拆分就是把一个表的数据给弄到多个库的多个表里去，但是每个表的表结构都是一样的，不过每个表里数据是不相同的，所有库表的数据加起来就是全部的数据。水平拆分的意义在于将数据均匀放在更多的库表，然后用更多的库表来抗并发，同时也保证每个表的数据量不会太多，影响查询效率。
+垂直拆分就是把一个有很多字段的表给拆分成多...
+            
+          </div>
+        
+      </div>
+
+         
+    </div>
+    
+     
+    <a class="right-panel  non-pic  "
+      
+      href="/2023/09/07/sub-table/" 
+    >
+       
+      <i class="fa-solid fa-angle-right non-pic"></i>
+       
+    </a>
+     
+  </div>
+  
+</article>
+
+
+
+
+
+
+
+   
+
+
+<article id="post-mysql-read-write" class="h-entry article article-type-post" itemprop="blogPost" itemscope itemtype="https://schema.org/BlogPosting">
+   
+  <div class="article-inner">
+    <div class="article-main">
+      <header class="article-header">
+        
+<div class="main-title-bar">
+  <div class="main-title-dot"></div>
+  
+    
+      <h1 itemprop="name">
+        <a class="p-name article-title" href="/2023/09/02/mysql-read-write/">mysql-read-write</a>
+      </h1>
+    
+  
+</div>
+
+        <div class='meta-info-bar'>
+          <div class="meta-info">
+  <time class="dt-published" datetime="2023-09-02T07:25:24.000Z" itemprop="datePublished">2023-09-02</time>
+</div>
+          <div class="need-seperator meta-info">
+            <div class="meta-cate-flex">
+  
+    Uncategorized 
+   
+</div>
+  
+          </div>
+          <div class="wordcount need-seperator meta-info">
+             words 
+          </div>
+        </div>
+        
+      </header>
+      <div class="e-content article-entry" itemprop="articleBody">
+        
+          <div class="truncate-text">
+            
+              
+            
+          </div>
+        
+      </div>
+
+         
+    </div>
+    
+     
+    <a class="right-panel  non-pic  "
+      
+      href="/2023/09/02/mysql-read-write/" 
+    >
+       
+      <i class="fa-solid fa-angle-right non-pic"></i>
+       
+    </a>
+     
+  </div>
+  
+</article>
+
+
+
+
+
+
+
+   
+
+
+<article id="post-master-slave" class="h-entry article article-type-post" itemprop="blogPost" itemscope itemtype="https://schema.org/BlogPosting">
+   
+  <div class="article-inner">
+    <div class="article-main">
+      <header class="article-header">
+        
+<div class="main-title-bar">
+  <div class="main-title-dot"></div>
+  
+    
+      <h1 itemprop="name">
+        <a class="p-name article-title" href="/2023/09/02/master-slave/">mysql主从复制</a>
+      </h1>
+    
+  
+</div>
+
+        <div class='meta-info-bar'>
+          <div class="meta-info">
+  <time class="dt-published" datetime="2023-09-02T06:25:54.000Z" itemprop="datePublished">2023-09-02</time>
+</div>
+          <div class="need-seperator meta-info">
+            <div class="meta-cate-flex">
+  
+    Uncategorized 
+   
+</div>
+  
+          </div>
+          <div class="wordcount need-seperator meta-info">
+             words 
+          </div>
+        </div>
+        
+  <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/mysql/" rel="tag">mysql</a></li></ul>
+
+      </header>
+      <div class="e-content article-entry" itemprop="articleBody">
+        
+          <div class="truncate-text">
+            
+              瞎扯时间到！！！
+什么是主从复制？主从复制是指将主库到表结构、表数据也就是DDL和DML操作通过binlog日志传输到从库中去，然后在从库中对这些日志从新执行(重做),从而使的从库和主库数据保持同步。
+mysql支持一台主库向多台从库进行复制，从库也可以作为主库像其他的从库同步数据，形成链式复制。
+为什么需要主从复制
+主库出现问题，可以快速切换到从库，提供服务
+实现读写分离，降低主库的访问压力。写操作全都在主库上执行，读操作都在从库上执行
+可以在从库进行备份操作，以避免备份期间影响主库服务（备份期间会加一个全局锁，整个数据库就会是只读的，无法进行增删改操作。会把整个库锁住）
+
+原理
+master主库在事务提交的时候，会把数据变更记录在二进制日志文件binlog中
+从库有个IOThread线程读取主库的二进制日志文件binlog，写入到从库的中继日志RelayLog里。
+slave重做中继日志RelayLog中的事件，将改变反映在自己的数据中
+
+
+            
+          </div>
+        
+      </div>
+
+         
+    </div>
+    
+     
+    <a class="right-panel  non-pic  "
+      
+      href="/2023/09/02/master-slave/" 
+    >
+       
+      <i class="fa-solid fa-angle-right non-pic"></i>
+       
+    </a>
+     
+  </div>
+  
+</article>
+
+
+
+
+
+
+
+   
+
+
+<article id="post-aksk" class="h-entry article article-type-post" itemprop="blogPost" itemscope itemtype="https://schema.org/BlogPosting">
+   
+  <div class="article-inner">
+    <div class="article-main">
+      <header class="article-header">
+        
+<div class="main-title-bar">
+  <div class="main-title-dot"></div>
+  
+    
+      <h1 itemprop="name">
+        <a class="p-name article-title" href="/2023/09/01/aksk/">AK/SK简述</a>
+      </h1>
+    
+  
+</div>
+
+        <div class='meta-info-bar'>
+          <div class="meta-info">
+  <time class="dt-published" datetime="2023-09-01T05:08:37.000Z" itemprop="datePublished">2023-09-01</time>
+</div>
+          <div class="need-seperator meta-info">
+            <div class="meta-cate-flex">
+  
+    Uncategorized 
+   
+</div>
+  
+          </div>
+          <div class="wordcount need-seperator meta-info">
+             words 
+          </div>
+        </div>
+        
+  <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/%E7%9F%A5%E8%AF%86%E7%82%B9/" rel="tag">知识点</a></li></ul>
+
+      </header>
+      <div class="e-content article-entry" itemprop="articleBody">
+        
+          <div class="truncate-text">
+            
+              什么是AK&#x2F;SKak&#x2F;sk是一种身份认证方式，常用于系统间接口调用时的身份验证，其中ak为Access Key ID，sk为Secret Access Key。客户端和服务端两者会协商保存一份相同的sk，其中sk必须保密。
+AK&#x2F;SK认证的流程假设我们目前有这么个情景：我们（开发人员）需要向合作方提供一个接口，然后我们需要保证这个接口返回的数据是加密的，避免被人拦截。
+首先，我们提供给合作方ak-作为身份标识，sk-作为对请求数据的加密密钥。然后合作方在调用我们的接口的时候，传入ak作为身份标识，然后将其他的参数，用sk加密，这里我们以AES对称加密举例,然后我们收到他们的请求后，拿到ak，去数据库里查询对应的合作方信息，如果没有则说明身份不对，如果查询到里信息，则认证通过，然后拿到对应的sk去对加密内容进行解密、处理业务流程、返回数据（同样采用刚刚的sk进行加密）。
+
+
+            
+          </div>
+        
+      </div>
+
+         
+    </div>
+    
+     
+    <a class="right-panel  non-pic  "
+      
+      href="/2023/09/01/aksk/" 
+    >
+       
+      <i class="fa-solid fa-angle-right non-pic"></i>
+       
+    </a>
+     
+  </div>
+  
+</article>
+
+
+
+
+
+
+
+
+  <nav id="page-nav">
+    <!-- 在第二页时 page.prev_link 不知为何无法返回正确的链接 -->
+    <a id="prev-btn" class="page-nav-btn disabled" href=" /  ">
+      <i class="fa-solid fa-angle-left"></i>
+    </a>
+    <div id="num-bar">
+      <span class="page-number current">1</span><a class="page-number" href="/page/2/">2</a><a class="page-number" href="/page/3/">3</a>  
+    </div>
+    <a id="next-btn" class="page-nav-btn " href="/page/2/">
+      <i class="fa-solid fa-angle-right"></i>
+    </a>
+  </nav>
+
+
+    </div>
+    <div id="footer-wrapper">
+      <footer id="footer">
+  
+  <div id="footer-info" class="inner">
+    
+    &copy; 2024 Your Name<br>
+    Powered by <a href="https://hexo.io/" target="_blank">Hexo</a> & Theme <a target="_blank" rel="noopener" href="https://github.com/saicaca/hexo-theme-vivia">Vivia</a>
+  </div>
+</footer>
+
+    </div>
+    <div class="back-to-top-wrapper">
+    <button id="back-to-top-btn" class="back-to-top-btn hide" onclick="topFunction()">
+        <i class="fa-solid fa-angle-up"></i>
+    </button>
+</div>
+
+<script>
+    function topFunction() {
+        window.scroll({ top: 0, behavior: 'smooth' });
+    }
+    let btn = document.getElementById('back-to-top-btn');
+    function scrollFunction() {
+        if (document.body.scrollTop > 600 || document.documentElement.scrollTop > 600) {
+            btn.classList.remove('hide')
+        } else {
+            btn.classList.add('hide')
+        }
+    }
+    window.onscroll = function() {
+        scrollFunction();
+    }
+</script>
+
+  </div>
+  <script src="/js/light-dark-switch.js"></script>
+</body>
+</html>
