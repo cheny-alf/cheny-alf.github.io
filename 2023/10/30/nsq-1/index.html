@@ -1,0 +1,314 @@
+<!DOCTYPE html>
+
+
+<html theme="dark" showBanner="true" hasBanner="false" > 
+<link href="https://cdn.staticfile.org/font-awesome/6.4.2/css/fontawesome.min.css" rel="stylesheet">
+<link href="https://cdn.staticfile.org/font-awesome/6.4.2/css/brands.min.css" rel="stylesheet">
+<link href="https://cdn.staticfile.org/font-awesome/6.4.2/css/solid.min.css" rel="stylesheet">
+<script src="/js/color.global.min.js" ></script>
+<script src="/js/load-settings.js" ></script>
+<head>
+  <meta charset="utf-8">
+  
+  
+  
+
+  
+  <title>nsq-1 | 陈sir爱狂扁</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+  <link rel="preload" href="/css/fonts/Roboto-Regular.ttf" as="font" type="font/ttf" crossorigin="anonymous">
+  <link rel="preload" href="/css/fonts/Roboto-Bold.ttf" as="font" type="font/ttf" crossorigin="anonymous">
+
+  <meta name="description" content="1. 初识NSQ is a realtime distributed messaging platform. nsq 是一款基于 GO 实现的分布式消息队列，它可用于大规模系统中的实时消息服务，并且每天能够处理数亿级别的消息。 2. NSQ特性 分布式架构: NSQ采用无单点故障的分布式和去中心化拓扑结构，确保了系统的高容错性和高可用性，同时提供了可靠的消息传递保证。 水平扩展性: NSQ能够水平">
+<meta property="og:type" content="article">
+<meta property="og:title" content="nsq-1">
+<meta property="og:url" content="https://cheny-alf.github.io/2023/10/30/nsq-1/index.html">
+<meta property="og:site_name" content="陈sir爱狂扁">
+<meta property="og:description" content="1. 初识NSQ is a realtime distributed messaging platform. nsq 是一款基于 GO 实现的分布式消息队列，它可用于大规模系统中的实时消息服务，并且每天能够处理数亿级别的消息。 2. NSQ特性 分布式架构: NSQ采用无单点故障的分布式和去中心化拓扑结构，确保了系统的高容错性和高可用性，同时提供了可靠的消息传递保证。 水平扩展性: NSQ能够水平">
+<meta property="og:locale" content="en_US">
+<meta property="article:published_time" content="2023-10-30T09:41:14.000Z">
+<meta property="article:modified_time" content="2024-05-07T12:10:08.333Z">
+<meta property="article:author" content="John Doe">
+<meta property="article:tag" content="Golang">
+<meta property="article:tag" content="nsq">
+<meta name="twitter:card" content="summary">
+  
+  
+    <link rel="icon" media="(prefers-color-scheme: light)" href="/images/favicon-light-32.png" sizes="32x32">
+    <link rel="icon" media="(prefers-color-scheme: light)" href="/images/favicon-light-128.png" sizes="128x128">
+    <link rel="icon" media="(prefers-color-scheme: light)" href="/images/favicon-light-180.png" sizes="180x180">
+    <link rel="icon" media="(prefers-color-scheme: light)" href="/images/favicon-light-192.png" sizes="192x192">
+    <link rel="icon" media="(prefers-color-scheme: dark)" href="/images/favicon-dark-32.png" sizes="32x32">
+    <link rel="icon" media="(prefers-color-scheme: dark)" href="/images/favicon-dark-128.png" sizes="128x128">
+    <link rel="icon" media="(prefers-color-scheme: dark)" href="/images/favicon-dark-180.png" sizes="180x180">
+    <link rel="icon" media="(prefers-color-scheme: dark)" href="/images/favicon-dark-192.png" sizes="192x192">
+  
+  
+  
+<link rel="stylesheet" href="/css/style.css">
+
+<meta name="generator" content="Hexo 6.3.0"></head>
+
+<body>
+  
+   
+  <div id="main-grid" class="  ">
+    <div id="nav" class=""  >
+      <navbar id="navbar">
+  <nav id="title-nav">
+    <a href="/">
+      <div id="vivia-logo">
+        <div class="dot"></div>
+        <div class="dot"></div>
+        <div class="dot"></div>
+        <div class="dot"></div>
+      </div>
+      <div>陈sir爱狂扁 </div>
+    </a>
+  </nav>
+  <nav id="main-nav">
+    
+      <a class="main-nav-link" href="/">Home</a>
+    
+      <a class="main-nav-link" href="/archives">Archives</a>
+    
+      <a class="main-nav-link" href="/about">About</a>
+    
+  </nav>
+  <nav id="sub-nav">
+    <a id="theme-btn" class="nav-icon">
+      <span class="light-mode-icon"><svg xmlns="http://www.w3.org/2000/svg" height="20" viewBox="0 -960 960 960" width="20"><path d="M438.5-829.913v-48q0-17.452 11.963-29.476 11.964-12.024 29.326-12.024 17.363 0 29.537 12.024t12.174 29.476v48q0 17.452-11.963 29.476-11.964 12.024-29.326 12.024-17.363 0-29.537-12.024T438.5-829.913Zm0 747.826v-48q0-17.452 11.963-29.476 11.964-12.024 29.326-12.024 17.363 0 29.537 12.024t12.174 29.476v48q0 17.452-11.963 29.476-11.964 12.024-29.326 12.024-17.363 0-29.537-12.024T438.5-82.087ZM877.913-438.5h-48q-17.452 0-29.476-11.963-12.024-11.964-12.024-29.326 0-17.363 12.024-29.537t29.476-12.174h48q17.452 0 29.476 11.963 12.024 11.964 12.024 29.326 0 17.363-12.024 29.537T877.913-438.5Zm-747.826 0h-48q-17.452 0-29.476-11.963-12.024-11.964-12.024-29.326 0-17.363 12.024-29.537T82.087-521.5h48q17.452 0 29.476 11.963 12.024 11.964 12.024 29.326 0 17.363-12.024 29.537T130.087-438.5Zm660.174-290.87-34.239 32q-12.913 12.674-29.565 12.174-16.653-.5-29.327-13.174-12.674-12.673-12.554-28.826.12-16.152 12.794-28.826l33-35q12.913-12.674 30.454-12.674t30.163 12.847q12.709 12.846 12.328 30.826-.38 17.98-13.054 30.653ZM262.63-203.978l-32 34q-12.913 12.674-30.454 12.674t-30.163-12.847q-12.709-12.846-12.328-30.826.38-17.98 13.054-30.653l33.239-31q12.913-12.674 29.565-12.174 16.653.5 29.327 13.174 12.674 12.673 12.554 28.826-.12 16.152-12.794 28.826Zm466.74 33.239-32-33.239q-12.674-12.913-12.174-29.565.5-16.653 13.174-29.327 12.673-12.674 28.826-13.054 16.152-.38 28.826 12.294l35 33q12.674 12.913 12.674 30.454t-12.847 30.163q-12.846 12.709-30.826 12.328-17.98-.38-30.653-13.054ZM203.978-697.37l-34-33q-12.674-12.913-13.174-29.945-.5-17.033 12.174-29.707t31.326-13.293q18.653-.62 31.326 13.054l32 34.239q11.674 12.913 11.174 29.565-.5 16.653-13.174 29.327-12.673 12.674-28.826 12.554-16.152-.12-28.826-12.794ZM480-240q-100 0-170-70t-70-170q0-100 70-170t170-70q100 0 170 70t70 170q0 100-70 170t-170 70Zm-.247-82q65.703 0 111.475-46.272Q637-414.544 637-480.247t-45.525-111.228Q545.95-637 480.247-637t-111.475 45.525Q323-545.95 323-480.247t45.525 111.975Q414.05-322 479.753-322ZM481-481Z"/></svg></span>
+      <span class="dark-mode-icon"><svg xmlns="http://www.w3.org/2000/svg" height="20" viewBox="0 -960 960 960" width="20"><path d="M480.239-116.413q-152.63 0-258.228-105.478Q116.413-327.37 116.413-480q0-130.935 77.739-227.435t206.304-125.043q43.022-9.631 63.87 10.869t3.478 62.805q-8.891 22.043-14.315 44.463-5.424 22.42-5.424 46.689 0 91.694 64.326 155.879 64.325 64.186 156.218 64.186 24.369 0 46.978-4.946 22.609-4.945 44.413-14.076 42.826-17.369 62.967 1.142 20.142 18.511 10.511 61.054Q807.174-280 712.63-198.206q-94.543 81.793-232.391 81.793Zm0-95q79.783 0 143.337-40.217 63.554-40.218 95.793-108.283-15.608 4.044-31.097 5.326-15.49 1.283-31.859.805-123.706-4.066-210.777-90.539-87.071-86.473-91.614-212.092-.24-16.369.923-31.978 1.164-15.609 5.446-30.978-67.826 32.478-108.282 96.152Q211.652-559.543 211.652-480q0 111.929 78.329 190.258 78.329 78.329 190.258 78.329ZM466.13-465.891Z"/></svg></span>
+    </a>
+    
+    <div id="nav-menu-btn" class="nav-icon">
+      <svg xmlns="http://www.w3.org/2000/svg" height="20" viewBox="0 -960 960 960" width="20"><path d="M177.37-252.282q-17.453 0-29.477-11.964-12.024-11.963-12.024-29.326t12.024-29.537q12.024-12.174 29.477-12.174h605.26q17.453 0 29.477 11.964 12.024 11.963 12.024 29.326t-12.024 29.537q-12.024 12.174-29.477 12.174H177.37Zm0-186.218q-17.453 0-29.477-11.963-12.024-11.964-12.024-29.326 0-17.363 12.024-29.537T177.37-521.5h605.26q17.453 0 29.477 11.963 12.024 11.964 12.024 29.326 0 17.363-12.024 29.537T782.63-438.5H177.37Zm0-186.217q-17.453 0-29.477-11.964-12.024-11.963-12.024-29.326t12.024-29.537q12.024-12.174 29.477-12.174h605.26q17.453 0 29.477 11.964 12.024 11.963 12.024 29.326t-12.024 29.537q-12.024 12.174-29.477 12.174H177.37Z"/></svg>
+    </div>
+  </nav>
+</navbar>
+<div id="nav-dropdown" class="hidden">
+  <div id="dropdown-link-list">
+    
+      <a class="nav-dropdown-link" href="/">Home</a>
+    
+      <a class="nav-dropdown-link" href="/archives">Archives</a>
+    
+      <a class="nav-dropdown-link" href="/about">About</a>
+    
+     
+    </div>
+</div>
+<script>
+  let dropdownBtn = document.getElementById("nav-menu-btn");
+  let dropdownEle = document.getElementById("nav-dropdown");
+  dropdownBtn.onclick = function() {
+    dropdownEle.classList.toggle("hidden");
+  }
+</script>
+    </div>
+    <div id="sidebar-wrapper">
+      <sidebar id="sidebar">
+  
+    <div class="widget-wrap">
+  <div class="info-card">
+    <div class="avatar">
+      
+        <image src=/./images/logo.jpg></image>
+      
+      <div class="img-dim"></div>
+    </div>
+    <div class="info">
+      <div class="username">Cheny </div>
+      <div class="dot"></div>
+      <div class="subtitle">Someday i'll be just like You! </div>
+      <div class="link-list">
+        
+          <a class="link-btn" target="_blank" rel="noopener" href="https://twitter.com" title="Twitter"><i class="fa-brands fa-twitter"></i></a>
+        
+          <a class="link-btn" target="_blank" rel="noopener" href="https://github.com/cheny-alf" title="GitHub"><i class="fa-brands fa-github"></i></a>
+         
+      </div>  
+    </div>
+  </div>
+</div>
+
+  
+  <div class="sticky">
+    
+      
+
+
+  <div class="widget-wrap">
+    <div class="widget">
+      <h3 class="widget-title">Categories</h3>
+      <div class="category-box">
+            <a class="category-link" href="/categories/%E6%8A%80%E6%9C%AF/">
+                技术
+                <div class="category-count">22</div>
+            </a>
+        </div>
+    </div>
+  </div>
+
+
+    
+      
+  <div class="widget-wrap">
+    <div class="widget">
+      <h3 class="widget-title">Tags</h3>
+      <ul class="widget-tag-list" itemprop="keywords"><li class="widget-tag-list-item"><a class="widget-tag-list-link" href="/tags/Golang/" rel="tag">Golang</a></li><li class="widget-tag-list-item"><a class="widget-tag-list-link" href="/tags/Kafka/" rel="tag">Kafka</a></li><li class="widget-tag-list-item"><a class="widget-tag-list-link" href="/tags/Redis/" rel="tag">Redis</a></li><li class="widget-tag-list-item"><a class="widget-tag-list-link" href="/tags/golang/" rel="tag">golang</a></li><li class="widget-tag-list-item"><a class="widget-tag-list-link" href="/tags/k8s/" rel="tag">k8s</a></li><li class="widget-tag-list-item"><a class="widget-tag-list-link" href="/tags/mysql/" rel="tag">mysql</a></li><li class="widget-tag-list-item"><a class="widget-tag-list-link" href="/tags/nsq/" rel="tag">nsq</a></li><li class="widget-tag-list-item"><a class="widget-tag-list-link" href="/tags/redis/" rel="tag">redis</a></li><li class="widget-tag-list-item"><a class="widget-tag-list-link" href="/tags/%E5%BB%B6%E8%BF%9F%E9%98%9F%E5%88%97/" rel="tag">延迟队列</a></li><li class="widget-tag-list-item"><a class="widget-tag-list-link" href="/tags/%E6%97%B6%E5%BA%8F%E6%95%B0%E6%8D%AE%E5%BA%93TSDB/" rel="tag">时序数据库TSDB</a></li><li class="widget-tag-list-item"><a class="widget-tag-list-link" href="/tags/%E7%9F%A5%E8%AF%86%E7%82%B9/" rel="tag">知识点</a></li><li class="widget-tag-list-item"><a class="widget-tag-list-link" href="/tags/%E9%99%90%E6%B5%81/" rel="tag">限流</a></li><li class="widget-tag-list-item"><a class="widget-tag-list-link" href="/tags/%E9%9D%A2%E8%AF%95/" rel="tag">面试</a></li></ul>
+    </div>
+  </div>
+
+
+    
+  </div>
+</sidebar>
+    </div>
+    <div id="content-body">
+       
+
+
+<article id="post-nsq-1" class="h-entry article article-type-post" itemprop="blogPost" itemscope itemtype="https://schema.org/BlogPosting">
+  
+    
+   
+  <div class="article-inner">
+    <div class="article-main">
+      <header class="article-header">
+        
+<div class="main-title-bar">
+  <div class="main-title-dot"></div>
+  
+    
+      <h1 class="p-name article-title" itemprop="headline name">
+        nsq-1
+      </h1>
+    
+  
+</div>
+
+        <div class='meta-info-bar'>
+          <div class="meta-info">
+  <time class="dt-published" datetime="2023-10-30T09:41:14.000Z" itemprop="datePublished">2023-10-30</time>
+</div>
+          <div class="need-seperator meta-info">
+            <div class="meta-cate-flex">
+  
+  <a class="meta-cate-link" href="/categories/%E6%8A%80%E6%9C%AF/">技术</a>
+   
+</div>
+  
+          </div>
+          <div class="wordcount need-seperator meta-info">
+            4.3k words 
+          </div>
+        </div>
+        
+  <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Golang/" rel="tag">Golang</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/nsq/" rel="tag">nsq</a></li></ul>
+
+      </header>
+      <div class="e-content article-entry" itemprop="articleBody">
+        
+          <h4 id="1-初识"><a href="#1-初识" class="headerlink" title="1. 初识"></a>1. 初识</h4><p><code>NSQ is a realtime distributed messaging platform.</code> nsq 是一款基于 GO 实现的分布式消息队列，<br>它可用于大规模系统中的实时消息服务，并且每天能够处理数亿级别的消息。<br></p>
+<h4 id="2-NSQ特性"><a href="#2-NSQ特性" class="headerlink" title="2. NSQ特性"></a>2. NSQ特性</h4><ul>
+<li><strong>分布式架构</strong>: NSQ采用无单点故障的分布式和去中心化拓扑结构，确保了系统的高容错性和高可用性，同时提供了可靠的消息传递保证。</li>
+<li><strong>水平扩展性</strong>: NSQ能够水平扩展，无需依赖任何中央代理，其内置的发现机制简化了集群中节点的添加，支持发布-订阅和负载均衡的消息传递方式，性能同样出色。</li>
+<li><strong>运维友好</strong>: NSQ易于配置和部署，带有管理界面，其二进制文件无需运行时依赖，提供针对Linux、Darwin、FreeBSD和Windows的预编译版本，以及官方的Docker镜像。</li>
+<li><strong>集成性</strong>: NSQ提供了官方的Go和Python库，以及社区支持的多种主流语言库（详见客户端库），同时，如果用户有兴趣自行构建，还可以访问协议规范文档。</li>
+</ul>
+<h4 id="3-NSQ使用"><a href="#3-NSQ使用" class="headerlink" title="3. NSQ使用"></a>3. NSQ使用</h4><ol>
+<li>服务安装与启动<br><br><a target="_blank" rel="noopener" href="https://nsq.io/deployment/installing.html">官方文档</a>中有很多的安装方式，我们选择最后一个，源码启动<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">$ git clone https:<span class="comment">//github.com/nsqio/nsq</span></span><br><span class="line">$ cd nsq</span><br><span class="line">$ <span class="built_in">make</span> <span class="comment">// 编译</span></span><br><span class="line">$ cd build</span><br><span class="line">$ ./nsqlookupd &amp; <span class="comment">// 启动 nsqlookupd</span></span><br><span class="line">$ ./nsqd --lookupd-tcp-address=<span class="number">127.0</span><span class="number">.0</span><span class="number">.1</span>:<span class="number">4160</span> &amp; <span class="comment">// 启动nsqd</span></span><br><span class="line">$ ./nsqadmin --lookupd-http-address=<span class="number">127.0</span><span class="number">.0</span><span class="number">.1</span>:<span class="number">4161</span> &amp; <span class="comment">// 启动nsqadmin</span></span><br></pre></td></tr></table></figure>
+在nsqadmin启动后即可在浏览器中输入 <a target="_blank" rel="noopener" href="http://localhost:4171/">http://localhost:4171</a> 访问管理后台，查看具体的 topic、channel 信息。</li>
+<li>编写客户端<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br><span class="line">115</span><br><span class="line">116</span><br><span class="line">117</span><br><span class="line">118</span><br><span class="line">119</span><br><span class="line">120</span><br><span class="line">121</span><br><span class="line">122</span><br><span class="line">123</span><br><span class="line">124</span><br><span class="line">125</span><br><span class="line">126</span><br><span class="line">127</span><br><span class="line">128</span><br><span class="line">129</span><br><span class="line">130</span><br><span class="line">131</span><br><span class="line">132</span><br><span class="line">133</span><br><span class="line">134</span><br><span class="line">135</span><br><span class="line">136</span><br><span class="line">137</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> main</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> (</span><br><span class="line">	<span class="string">&quot;fmt&quot;</span></span><br><span class="line">	<span class="string">&quot;sync&quot;</span></span><br><span class="line">	<span class="string">&quot;testing&quot;</span></span><br><span class="line">	<span class="string">&quot;time&quot;</span></span><br><span class="line"></span><br><span class="line">	<span class="string">&quot;github.com/nsqio/go-nsq&quot;</span></span><br><span class="line">)</span><br><span class="line"></span><br><span class="line"><span class="keyword">const</span> (</span><br><span class="line">	<span class="comment">// 用于测试的消息主题</span></span><br><span class="line">	testTopic = <span class="string">&quot;my_test_topic&quot;</span></span><br><span class="line">	<span class="comment">// nsqd 服务端地址</span></span><br><span class="line">	nsqdAddr = <span class="string">&quot;localhost:4150&quot;</span></span><br><span class="line">	<span class="comment">// 订阅 channelGroupA 的消费者 A1</span></span><br><span class="line">	consumerA1 = <span class="string">&quot;consumer_a1&quot;</span></span><br><span class="line">	<span class="comment">// 订阅 channelGroupA 的消费者 A2</span></span><br><span class="line">	consumerA2 = <span class="string">&quot;consumer_a2&quot;</span></span><br><span class="line">	<span class="comment">// 单独订阅 channelGroupB 的消费者 B</span></span><br><span class="line">	consumerB = <span class="string">&quot;consumer_b&quot;</span></span><br><span class="line">	<span class="comment">// testTopic 下的 channelA</span></span><br><span class="line">	channelGroupA = <span class="string">&quot;channel_a&quot;</span></span><br><span class="line">	<span class="comment">// testTopic 下的 channelB</span></span><br><span class="line">	channelGroupB = <span class="string">&quot;channel_b&quot;</span></span><br><span class="line">)</span><br><span class="line"></span><br><span class="line"><span class="comment">// 建立 consumer 与 channel 之间的映射关系</span></span><br><span class="line"><span class="comment">// consumerA1、consumerA2 -&gt; channelA</span></span><br><span class="line"><span class="comment">// consumerB -&gt; channelB</span></span><br><span class="line"><span class="keyword">var</span> consumerToChannelGroup = <span class="keyword">map</span>[<span class="type">string</span>]<span class="type">string</span>&#123;</span><br><span class="line">	consumerA1: channelGroupA,</span><br><span class="line">	consumerA2: channelGroupA,</span><br><span class="line">	consumerB:  channelGroupB,</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">Test_nsq</span><span class="params">(t *testing.T)</span></span> &#123;</span><br><span class="line">	<span class="comment">// 消费者消费到消息后的执行逻辑</span></span><br><span class="line">	msgCallback := <span class="function"><span class="keyword">func</span><span class="params">(consumerName <span class="type">string</span>, msg []<span class="type">byte</span>)</span></span> <span class="type">error</span> &#123;</span><br><span class="line">		t.Logf(<span class="string">&quot;i am %s, receive msg: %s&quot;</span>, consumerName, msg)</span><br><span class="line">		<span class="keyword">return</span> <span class="literal">nil</span></span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	<span class="comment">// 运行 producer</span></span><br><span class="line">	<span class="keyword">if</span> err := runProducer(); err != <span class="literal">nil</span> &#123;</span><br><span class="line">		t.Error(err)</span><br><span class="line">		<span class="keyword">return</span></span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	<span class="comment">// 并发运行三个 consumer</span></span><br><span class="line">	<span class="keyword">var</span> wg sync.WaitGroup</span><br><span class="line">	<span class="keyword">for</span> consumer := <span class="keyword">range</span> consumerToChannelGroup &#123;</span><br><span class="line">		<span class="comment">// shadow</span></span><br><span class="line">		wg.Add(<span class="number">1</span>)</span><br><span class="line">		<span class="keyword">go</span> <span class="function"><span class="keyword">func</span><span class="params">(consumer <span class="type">string</span>)</span></span> &#123;</span><br><span class="line">			<span class="keyword">defer</span> wg.Done()</span><br><span class="line">			<span class="keyword">if</span> err := runConsumer(consumer, msgCallback); err != <span class="literal">nil</span> &#123;</span><br><span class="line">				t.Error(err)</span><br><span class="line">			&#125;</span><br><span class="line">		&#125;(consumer)</span><br><span class="line"></span><br><span class="line">	&#125;</span><br><span class="line">	wg.Wait()</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 运行生产者</span></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">runProducer</span><span class="params">()</span></span> <span class="type">error</span> &#123;</span><br><span class="line">	<span class="comment">// 通过 addr 直连 nsqd 服务端</span></span><br><span class="line">	producer, err := nsq.NewProducer(nsqdAddr, nsq.NewConfig())</span><br><span class="line">	<span class="keyword">if</span> err != <span class="literal">nil</span> &#123;</span><br><span class="line">		<span class="keyword">return</span> err</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="keyword">defer</span> producer.Stop()</span><br><span class="line"></span><br><span class="line">	<span class="comment">// 通过 producer.Publish 方法，往 testTopic 中发送三条消息</span></span><br><span class="line">	<span class="keyword">for</span> i := <span class="number">0</span>; i &lt; <span class="number">3</span>; i++ &#123;</span><br><span class="line">		msg := fmt.Sprintf(<span class="string">&quot;hello xiaoxu %d&quot;</span>, i)</span><br><span class="line">		<span class="keyword">if</span> err := producer.Publish(testTopic, []<span class="type">byte</span>(msg)); err != <span class="literal">nil</span> &#123;</span><br><span class="line">			<span class="keyword">return</span> err</span><br><span class="line">		&#125;</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="keyword">return</span> <span class="literal">nil</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 用于处理消息的 processor，需要实现 go-nsq 中定义的 msgProcessor interface，核心是实现消息回调处理方法： func HandleMessage(msg *nsq.Message) error</span></span><br><span class="line"><span class="keyword">type</span> msgProcessor <span class="keyword">struct</span> &#123;</span><br><span class="line">	<span class="comment">// 消费者名称</span></span><br><span class="line">	consumerName <span class="type">string</span></span><br><span class="line">	<span class="comment">// 消息回调处理函数</span></span><br><span class="line">	callback <span class="function"><span class="keyword">func</span><span class="params">(consumerName <span class="type">string</span>, msg []<span class="type">byte</span>)</span></span> <span class="type">error</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">newMsgProcessor</span><span class="params">(consumerName <span class="type">string</span>, callback <span class="keyword">func</span>(consumerName <span class="type">string</span>, msg []<span class="type">byte</span>)</span></span> <span class="type">error</span>) *msgProcessor &#123;</span><br><span class="line">	<span class="keyword">return</span> &amp;msgProcessor&#123;</span><br><span class="line">		consumerName: consumerName,</span><br><span class="line">		callback:     callback,</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 消息回调处理</span></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="params">(m *msgProcessor)</span></span> HandleMessage(msg *nsq.Message) <span class="type">error</span> &#123;</span><br><span class="line">	<span class="comment">// 执行用户定义的业务处理逻辑</span></span><br><span class="line">	<span class="keyword">if</span> err := m.callback(m.consumerName, msg.Body); err != <span class="literal">nil</span> &#123;</span><br><span class="line">		<span class="keyword">return</span> err</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="comment">// 倘若业务处理成功，则调用 Finish 方法，发送消息的 ack</span></span><br><span class="line">	msg.Finish()</span><br><span class="line">	<span class="keyword">return</span> <span class="literal">nil</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 运行消费者</span></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">runConsumer</span><span class="params">(consumerName <span class="type">string</span>, callback <span class="keyword">func</span>(consumerName <span class="type">string</span>, msg []<span class="type">byte</span>)</span></span> <span class="type">error</span>) <span class="type">error</span> &#123;</span><br><span class="line">	<span class="comment">// 根据消费者名获取到对应的 channel</span></span><br><span class="line">	channel, ok := consumerToChannelGroup[consumerName]</span><br><span class="line">	<span class="keyword">if</span> !ok &#123;</span><br><span class="line">		<span class="keyword">return</span> fmt.Errorf(<span class="string">&quot;bad name: %s&quot;</span>, consumerName)</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	<span class="comment">// 指定 topic 和 channel，创建 consumer 实例</span></span><br><span class="line">	consumer, err := nsq.NewConsumer(testTopic, channel, nsq.NewConfig())</span><br><span class="line">	<span class="keyword">if</span> err != <span class="literal">nil</span> &#123;</span><br><span class="line">		<span class="keyword">return</span> err</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="keyword">defer</span> consumer.Stop()</span><br><span class="line"></span><br><span class="line">	<span class="comment">// 添加消息回调处理函数</span></span><br><span class="line">	consumer.AddHandler(newMsgProcessor(consumerName, callback))</span><br><span class="line"></span><br><span class="line">	<span class="comment">// consumer 连接到 nsqd 服务端，开启消费流程</span></span><br><span class="line">	<span class="keyword">if</span> err = consumer.ConnectToNSQD(nsqdAddr); err != <span class="literal">nil</span> &#123;</span><br><span class="line">		<span class="keyword">return</span> err</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	&lt;-time.After(<span class="number">5</span> * time.Second)</span><br><span class="line">	<span class="keyword">return</span> <span class="literal">nil</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></li>
+<li>测试<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">nsq_test.<span class="keyword">go</span>:<span class="number">41</span>: i am consumer_a2, receive msg: hello xiaoxu <span class="number">1</span></span><br><span class="line">nsq_test.<span class="keyword">go</span>:<span class="number">41</span>: i am consumer_b, receive msg: hello xiaoxu <span class="number">0</span></span><br><span class="line">nsq_test.<span class="keyword">go</span>:<span class="number">41</span>: i am consumer_a1, receive msg: hello xiaoxu <span class="number">0</span></span><br><span class="line">nsq_test.<span class="keyword">go</span>:<span class="number">41</span>: i am consumer_b, receive msg: hello xiaoxu <span class="number">1</span></span><br><span class="line">nsq_test.<span class="keyword">go</span>:<span class="number">41</span>: i am consumer_a2, receive msg: hello xiaoxu <span class="number">2</span></span><br><span class="line">nsq_test.<span class="keyword">go</span>:<span class="number">41</span>: i am consumer_b, receive msg: hello xiaoxu <span class="number">2</span></span><br><span class="line"></span><br></pre></td></tr></table></figure>
+可以看到，共享了 channelA 的两个 consumerA1、consumerA2 分摊了 topic 下的消息数据；而独享 channelB 的 consumer 则消费到了 topic 下的全量消息.</li>
+</ol>
+
+        
+      </div>
+
+         
+    </div>
+    
+     
+  </div>
+  
+    
+<nav id="article-nav">
+  <a class="article-nav-btn left "
+    
+      href="/2024/01/06/tsdb/"
+      title="时序数据库中的聚合计算：加速洞察与优化性能(上)"
+     >
+    <i class="fa-solid fa-angle-left"></i>
+    <p class="title-text">
+      
+        时序数据库中的聚合计算：加速洞察与优化性能(上)
+        
+    </p>
+  </a>
+  <a class="article-nav-btn right "
+    
+      href="/2023/10/30/nsq-Source-code-analysis/"
+      title="NSQD源码解析：执行入口分析与核心功能解释"
+     >
+
+    <p class="title-text">
+      
+        NSQD源码解析：执行入口分析与核心功能解释
+        
+    </p>
+    <i class="fa-solid fa-angle-right"></i>
+  </a>
+</nav>
+
+
+  
+</article>
+
+
+
+
+
+
+    </div>
+    <div id="footer-wrapper">
+      <footer id="footer">
+  
+  <div id="footer-info" class="inner">
+    
+    &copy; 2024 Cheny<br>
+    Powered by <a href="https://hexo.io/" target="_blank">Hexo</a> & Theme <a target="_blank" rel="noopener" href="https://github.com/saicaca/hexo-theme-vivia">Vivia</a>
+  </div>
+</footer>
+
+    </div>
+    <div class="back-to-top-wrapper">
+    <button id="back-to-top-btn" class="back-to-top-btn hide" onclick="topFunction()">
+        <i class="fa-solid fa-angle-up"></i>
+    </button>
+</div>
+
+<script>
+    function topFunction() {
+        window.scroll({ top: 0, behavior: 'smooth' });
+    }
+    let btn = document.getElementById('back-to-top-btn');
+    function scrollFunction() {
+        if (document.body.scrollTop > 600 || document.documentElement.scrollTop > 600) {
+            btn.classList.remove('hide')
+        } else {
+            btn.classList.add('hide')
+        }
+    }
+    window.onscroll = function() {
+        scrollFunction();
+    }
+</script>
+
+  </div>
+  <script src="/js/light-dark-switch.js"></script>
+</body>
+</html>
