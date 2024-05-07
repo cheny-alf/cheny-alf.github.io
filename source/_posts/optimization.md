@@ -3,6 +3,8 @@ title: 记录一次接口优化过程
 date: 2024-03-06 19:51:57
 tags:
  - mysql
+categories:
+ - 技术
 ---
 
 # 一、背景

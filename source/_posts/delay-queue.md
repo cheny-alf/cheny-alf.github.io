@@ -6,9 +6,7 @@ tags:
   - Redis
   - Golang
 categories:
-  - 延迟队列
-  - Redis
-  - Golang
+- 技术
 ---
 ### 基于 Redis 实现的支持延时/定时投递的消息队列
 

@@ -3,6 +3,8 @@ title: mysql主从复制
 date: 2023-09-02 14:25:54
 tags:
 - mysql
+categories:
+- 技术
 ---
 **瞎扯时间到！！！**
 

@@ -3,6 +3,8 @@ title: AK/SK简述
 date: 2023-09-01 13:08:37
 tags:
  - 知识点
+categories:
+ - 技术
 ---
 ### 什么是AK/SK
 

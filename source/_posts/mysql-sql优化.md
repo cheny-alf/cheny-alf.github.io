@@ -3,6 +3,8 @@ title: SQL进阶使用技巧
 date: 2023-09-08 13:50:35
 tags:
 - mysql
+categories:
+- 技术
 ---
 好文借鉴学习！！！
 https://github.com/allentofight/easy-cs/blob/main/MySQL/SQL%E8%BF%9B%E9%98%B6%E4%BD%BF%E7%94%A8%E6%8A%80%E5%B7%A7.md?plain=1

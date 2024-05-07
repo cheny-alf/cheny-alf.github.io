@@ -5,5 +5,5 @@ tags:
 - Golang
 - 面试
 categories:
-- Golang
+- 技术
 ---

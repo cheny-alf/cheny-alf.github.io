@@ -5,7 +5,7 @@ tags:
 - Redis
 - 面试
 categories:
-- Redis
+- 技术
 ---
 ## 内存淘汰策略
 Redis 中提供了 8 种内存淘汰策略：
