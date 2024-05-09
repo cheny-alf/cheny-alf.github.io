@@ -219,21 +219,26 @@
 </article>
 
 
-  
-  <script src='//unpkg.com/valine/dist/Valine.min.js'></script>
+
+
+  <script src="https://cdn.staticfile.org/twikoo/1.6.26/twikoo.all.min.js"></script>
   <div id="comment-card" class="comment-card">
     <div class="main-title-bar">
       <div class="main-title-dot"></div>
       <div class="main-title">Comments </div>
     </div>
-    <div id="vcomments"></div>
+    <div id="tcomment"></div>
   </div>
   <script>
-      new Valine({"enable":true,"appId":null,"appKey":null,"placeholder":"Just go go","pageSize":10,"highlight":true,"serverURLs":null,"el":"#vcomments"});
+      twikoo.init({
+          envId: '',
+          el: '#tcomment',
+          region: '',
+          path: 'location.pathname',
+          lang: '',
+      })
   </script>
-
-
-
+  
 
 
     </div>
