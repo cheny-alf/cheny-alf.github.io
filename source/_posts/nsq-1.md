@@ -1,5 +1,5 @@
 ---
-title: nsq-1
+title: 探索NSQ--初探与使用
 date: 2023-10-30 17:41:14
 tags:
 - Golang
