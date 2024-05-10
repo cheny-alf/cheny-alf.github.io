@@ -165,77 +165,6 @@
    
 
 
-<article id="post-mysql-read-write" class="h-entry article article-type-post" itemprop="blogPost" itemscope itemtype="https://schema.org/BlogPosting">
-   
-  <div class="article-inner">
-    <div class="article-main">
-      <header class="article-header">
-        
-<div class="main-title-bar">
-  <div class="main-title-dot"></div>
-  
-    
-      <h1 itemprop="name">
-        <a class="p-name article-title" href="/2023/09/02/mysql-read-write/">mysql-read-write</a>
-      </h1>
-    
-  
-</div>
-
-        <div class='meta-info-bar'>
-          <div class="meta-info">
-  <time class="dt-published" datetime="2023-09-02T07:25:24.000Z" itemprop="datePublished">2023-09-02</time>
-</div>
-          <div class="need-seperator meta-info">
-            <div class="meta-cate-flex">
-  
-    Uncategorized 
-   
-</div>
-  
-          </div>
-          <div class="wordcount need-seperator meta-info">
-             words 
-          </div>
-        </div>
-        
-      </header>
-      <div class="e-content article-entry" itemprop="articleBody">
-        
-          <div class="truncate-text">
-            
-              
-            
-          </div>
-        
-      </div>
-
-         
-    </div>
-    
-     
-    <a class="right-panel  non-pic  "
-      
-      href="/2023/09/02/mysql-read-write/" 
-    >
-       
-      <i class="fa-solid fa-angle-right non-pic"></i>
-       
-    </a>
-     
-  </div>
-  
-</article>
-
-
-
-
-
-
-
-   
-
-
 <article id="post-master-slave" class="h-entry article article-type-post" itemprop="blogPost" itemscope itemtype="https://schema.org/BlogPosting">
    
   <div class="article-inner">
@@ -692,6 +621,83 @@ More info: Deployment
     <a class="right-panel  non-pic  "
       
       href="/2023/07/11/limiter/" 
+    >
+       
+      <i class="fa-solid fa-angle-right non-pic"></i>
+       
+    </a>
+     
+  </div>
+  
+</article>
+
+
+
+
+
+
+
+   
+
+
+<article id="post-optimization" class="h-entry article article-type-post" itemprop="blogPost" itemscope itemtype="https://schema.org/BlogPosting">
+   
+  <div class="article-inner">
+    <div class="article-main">
+      <header class="article-header">
+        
+<div class="main-title-bar">
+  <div class="main-title-dot"></div>
+  
+    
+      <h1 itemprop="name">
+        <a class="p-name article-title" href="/2023/04/22/optimization/">记录一次接口优化过程</a>
+      </h1>
+    
+  
+</div>
+
+        <div class='meta-info-bar'>
+          <div class="meta-info">
+  <time class="dt-published" datetime="2023-04-22T11:51:57.000Z" itemprop="datePublished">2023-04-22</time>
+</div>
+          <div class="need-seperator meta-info">
+            <div class="meta-cate-flex">
+  
+  <a class="meta-cate-link" href="/categories/%E6%8A%80%E6%9C%AF/">技术</a>
+   
+</div>
+  
+          </div>
+          <div class="wordcount need-seperator meta-info">
+            1.7k words 
+          </div>
+        </div>
+        
+  <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/mysql/" rel="tag">mysql</a></li></ul>
+
+      </header>
+      <div class="e-content article-entry" itemprop="articleBody">
+        
+          <div class="truncate-text">
+            
+              一、背景一个接口执行的业务逻辑是返回区区域范围内所有停车场的热度值用于热力图渲染，发现这个接口响应时间普通在2.4s左右，影响前端热力图加载速度
+二、业务逻辑这个接口中共有3个数据查询操作
+
+获取区域信息：获取城市下各街道区域信息，全表数据量级19条， 本业务涉及10条,因数据量比较少，所以忽略此sql查询对耗时影响1SELECT * FROM `table1` WHERE `parent_area_id` = &quot;id&quot; AND `project_id` = 31 AND is_deleted=0
+获取区域下所有停⻋场数据，全表数据量级1155657条，本业务涉及1293条12SELECT * FROM table2 WHERE (open_tag=0 AND area_id IN (&quot;area1&quot;,&quot;area2&quot;,&quot;area3&quot;,&quot;area4&quot;,&quot;area5&quot;,&quot;area6&quot;,&quot;area7&quot;,&quot;area8&qu...
+            
+          </div>
+        
+      </div>
+
+         
+    </div>
+    
+     
+    <a class="right-panel  non-pic  "
+      
+      href="/2023/04/22/optimization/" 
     >
        
       <i class="fa-solid fa-angle-right non-pic"></i>
